@@ -1,9 +1,18 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { GAME_CLIPS } from "@/config/videoConfig";
 import { REORDERING_OPTIONS, CORRECT_REORDERING } from "@/config/puzzleConfig";
 import { CheckCircle, XCircle } from "lucide-react";
+
+function shuffleWithLabels<T>(items: T[], labels: number[]): { item: T; label: number }[] {
+  const paired = items.map((item, i) => ({ item, label: labels[i] }));
+  for (let i = paired.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [paired[i], paired[j]] = [paired[j], paired[i]];
+  }
+  return paired;
+}
 
 interface Props {
   onComplete: () => void;
@@ -13,6 +22,17 @@ interface Props {
 export default function ReorderingStage({ onComplete, onResult }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
   const clip = GAME_CLIPS.sixEight;
+
+  // Create 6 segments with labels, shown in random order
+  const shuffledSegments = useMemo(() => {
+    const segments = [1, 2, 3, 4, 5, 6];
+    const shuffled = [...segments];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }, []);
 
   const handleSelect = (label: string) => {
     if (selected) return;
@@ -33,14 +53,24 @@ export default function ReorderingStage({ onComplete, onResult }: Props) {
         </p>
       </div>
 
-      {/* Segment thumbnails - placeholders numbered 1-6 */}
+      {/* Segment images shown in random order with number labels */}
       <div className="mb-6 grid grid-cols-3 gap-3 sm:grid-cols-6">
-        {[1, 2, 3, 4, 5, 6].map((n) => (
+        {shuffledSegments.map((segNum) => (
           <div
-            key={n}
-            className="flex aspect-square items-center justify-center rounded-lg border border-border bg-surface text-2xl font-bold text-primary shadow-sm"
+            key={segNum}
+            className="relative overflow-hidden rounded-lg border border-border bg-surface shadow-sm"
           >
-            {n}
+            <video
+              src={clip.src}
+              className="aspect-[4/3] w-full object-cover"
+              playsInline
+              muted
+              autoPlay
+              loop
+            />
+            <div className="absolute bottom-0 left-0 right-0 bg-foreground/60 py-1 text-center text-lg font-bold text-background">
+              {segNum}
+            </div>
           </div>
         ))}
       </div>

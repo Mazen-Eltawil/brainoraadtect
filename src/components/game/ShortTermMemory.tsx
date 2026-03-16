@@ -105,7 +105,7 @@ export default function ShortTermMemory({ onComplete, onLogResponse }: Props) {
                 autoPlay
                 loop
               />
-              <div className="p-2 text-center text-sm font-medium text-foreground">{clip.label}</div>
+              {/* No label shown - player must identify from memory */}
               {showResult && (isCorrect || isSelected) && (
                 <div className="absolute inset-0 flex items-center justify-center bg-foreground/10">
                   {isCorrect ? (
