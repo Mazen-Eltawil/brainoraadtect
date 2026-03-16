@@ -1,9 +1,18 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { GAME_CLIPS } from "@/config/videoConfig";
 import { REORDERING_OPTIONS, CORRECT_REORDERING } from "@/config/puzzleConfig";
 import { CheckCircle, XCircle } from "lucide-react";
+
+function shuffleWithLabels<T>(items: T[], labels: number[]): { item: T; label: number }[] {
+  const paired = items.map((item, i) => ({ item, label: labels[i] }));
+  for (let i = paired.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [paired[i], paired[j]] = [paired[j], paired[i]];
+  }
+  return paired;
+}
 
 interface Props {
   onComplete: () => void;
