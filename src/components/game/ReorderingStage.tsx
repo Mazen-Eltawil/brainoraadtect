@@ -20,8 +20,13 @@ interface Props {
 }
 
 export default function ReorderingStage({ onComplete, onResult }: Props) {
-  const [selected, setSelected] = useState<string | null>(null);
   const clip = GAME_CLIPS.sixEight;
+
+  // Create 6 segments with labels, shown in random order
+  const shuffledSegments = useMemo(() => {
+    const segments = [1, 2, 3, 4, 5, 6];
+    return shuffleWithLabels(segments, segments);
+  }, []);
 
   const handleSelect = (label: string) => {
     if (selected) return;
