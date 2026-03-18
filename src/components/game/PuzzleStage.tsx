@@ -217,7 +217,7 @@ export default function PuzzleStage({ onComplete, onResult }: Props) {
             <h3 className="mb-2 text-sm font-bold uppercase tracking-widest text-muted-foreground">Rules</h3>
             <ul className="space-y-1.5 text-sm leading-relaxed text-foreground">
               <li>• Start on the START tile</li>
-              <li>• Move up, left, or right only</li>
+              <li>• Move to any adjacent tile (including diagonals)</li>
               <li>• No revisiting tiles</li>
               <li>• Visit all sand tiles</li>
               <li>• Avoid crabs 🦀</li>
