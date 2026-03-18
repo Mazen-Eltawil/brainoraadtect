@@ -28,12 +28,10 @@ function posEq(a: [number, number], b: [number, number]) {
 }
 
 function isAdjacent(a: [number, number], b: [number, number]) {
-  const dr = b[0] - a[0];
-  const dc = b[1] - a[1];
-  // allowed: up (dr=-1,dc=0), left (dr=0,dc=-1), right (dr=0,dc=1)
-  if (dr === -1 && dc === 0) return true;
-  if (dr === 0 && Math.abs(dc) === 1) return true;
-  return false;
+  const dr = Math.abs(b[0] - a[0]);
+  const dc = Math.abs(b[1] - a[1]);
+
+  return (dr !== 0 || dc !== 0) && dr <= 1 && dc <= 1;
 }
 
 function reducer(state: PuzzleState, action: PuzzleAction): PuzzleState {
