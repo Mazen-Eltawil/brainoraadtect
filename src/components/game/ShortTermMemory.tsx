@@ -1,13 +1,15 @@
 import { useState, useRef, useCallback, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { GAME_CLIPS, DISTRACTOR_CLIPS, ClipConfig } from "@/config/videoConfig";
 import { CheckCircle, XCircle } from "lucide-react";
 import { ResponseLog } from "@/types/game";
+import { gameCopy, Language, t } from "@/lib/gameCopy";
 
 interface Props {
   onComplete: () => void;
   onLogResponse: (r: ResponseLog) => void;
+  language: Language;
 }
 
 const TEST_CLIPS = ["fasla", "money", "marshmallow"] as const;
@@ -21,15 +23,15 @@ function shuffleArray<T>(arr: T[]): T[] {
   return a;
 }
 
-export default function ShortTermMemory({ onComplete, onLogResponse }: Props) {
+export default function ShortTermMemory({ onComplete, onLogResponse, language }: Props) {
   const [qIndex, setQIndex] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const startTimeRef = useRef(Date.now());
-  
+
   const questions = useMemo(() => {
     return TEST_CLIPS.map((key) => {
       const correct = GAME_CLIPS[key];
-      const others = Object.values(GAME_CLIPS).filter(c => c.id !== correct.id);
+      const others = Object.values(GAME_CLIPS).filter((c) => c.id !== correct.id);
       const distractors = [...others, ...DISTRACTOR_CLIPS.slice(0, 2)];
       const options = shuffleArray([correct, ...distractors.slice(0, 3)]);
       return { targetLabel: correct.label, correctId: correct.id, options };
@@ -70,11 +72,11 @@ export default function ShortTermMemory({ onComplete, onLogResponse }: Props) {
       className="mx-auto max-w-4xl px-4 py-8"
     >
       <div className="mb-6 rounded-xl border border-border bg-surface p-6 text-center shadow-sm">
-        <p className="text-sm tracking-widest uppercase text-muted-foreground mb-2">
-          Which movement matches this name?
+        <p className="mb-2 text-sm uppercase tracking-widest text-muted-foreground">
+          {t(language, gameCopy.shortTerm.prompt)}
         </p>
-        <p className="text-4xl font-bold text-primary tracking-tight">{q.targetLabel}</p>
-        <p className="mt-2 text-muted-foreground">Click the correct movement clip below.</p>
+        <p className="text-4xl font-bold tracking-tight text-primary">{q.targetLabel}</p>
+        <p className="mt-2 text-muted-foreground">{t(language, gameCopy.shortTerm.helper)}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -92,8 +94,8 @@ export default function ShortTermMemory({ onComplete, onLogResponse }: Props) {
                 showResult && isCorrect
                   ? "border-success ring-4 ring-success/20"
                   : showResult && isSelected && !isCorrect
-                  ? "border-destructive ring-4 ring-destructive/20"
-                  : "border-border hover:border-primary/50"
+                    ? "border-destructive ring-4 ring-destructive/20"
+                    : "border-border hover:border-primary/50"
               }`}
               aria-label={`Select ${clip.label}`}
             >
@@ -105,7 +107,6 @@ export default function ShortTermMemory({ onComplete, onLogResponse }: Props) {
                 autoPlay
                 loop
               />
-              {/* No label shown - player must identify from memory */}
               {showResult && (isCorrect || isSelected) && (
                 <div className="absolute inset-0 flex items-center justify-center bg-foreground/10">
                   {isCorrect ? (
@@ -127,13 +128,15 @@ export default function ShortTermMemory({ onComplete, onLogResponse }: Props) {
           className="mt-6 flex justify-end"
         >
           <Button onClick={handleNext} size="lg">
-            {qIndex + 1 < questions.length ? "Next Question" : "Continue"}
+            {qIndex + 1 < questions.length
+              ? t(language, gameCopy.shortTerm.nextQuestion)
+              : t(language, gameCopy.shortTerm.continue)}
           </Button>
         </motion.div>
       )}
 
       <p className="mt-4 text-center text-sm text-muted-foreground">
-        Question {qIndex + 1} of {questions.length}
+        {t(language, gameCopy.shortTerm.question)} {qIndex + 1} {t(language, gameCopy.shortTerm.of)} {questions.length}
       </p>
     </motion.div>
   );

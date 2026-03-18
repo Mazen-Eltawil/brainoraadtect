@@ -2,12 +2,14 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { gameCopy, Language, t } from "@/lib/gameCopy";
 
 interface OnboardingProps {
   onStart: (playerId: string) => void;
+  language: Language;
 }
 
-export default function Onboarding({ onStart }: OnboardingProps) {
+export default function Onboarding({ onStart, language }: OnboardingProps) {
   const [playerId, setPlayerId] = useState("");
 
   return (
@@ -18,26 +20,26 @@ export default function Onboarding({ onStart }: OnboardingProps) {
     >
       <div className="w-full max-w-md rounded-xl border border-border bg-surface p-8 shadow-md">
         <h1 className="mb-2 text-3xl font-bold tracking-tight text-foreground">
-          Welcome
+          {t(language, gameCopy.onboarding.title)}
         </h1>
         <p className="mb-6 text-base leading-relaxed text-muted-foreground">
-          This cognitive assessment will test your memory, sequencing, and problem-solving through a series of fun interactive stages. Enter your Player ID to begin.
+          {t(language, gameCopy.onboarding.description)}
         </p>
         <div className="space-y-4">
           <Input
-            placeholder="Enter Player ID"
+            placeholder={t(language, gameCopy.onboarding.placeholder)}
             value={playerId}
             onChange={(e) => setPlayerId(e.target.value)}
             className="h-12 text-base"
-            aria-label="Player ID"
+            aria-label={t(language, gameCopy.onboarding.placeholder)}
           />
           <Button
             onClick={() => onStart(playerId.trim())}
             disabled={!playerId.trim()}
-            className="w-full h-12 text-base"
+            className="h-12 w-full text-base"
             size="lg"
           >
-            Start Assessment
+            {t(language, gameCopy.onboarding.button)}
           </Button>
         </div>
       </div>

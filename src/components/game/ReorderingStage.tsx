@@ -1,29 +1,21 @@
-import { useState, useRef, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { GAME_CLIPS } from "@/config/videoConfig";
 import { REORDERING_OPTIONS, CORRECT_REORDERING } from "@/config/puzzleConfig";
 import { CheckCircle, XCircle } from "lucide-react";
-
-function shuffleWithLabels<T>(items: T[], labels: number[]): { item: T; label: number }[] {
-  const paired = items.map((item, i) => ({ item, label: labels[i] }));
-  for (let i = paired.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [paired[i], paired[j]] = [paired[j], paired[i]];
-  }
-  return paired;
-}
+import { gameCopy, Language, t } from "@/lib/gameCopy";
 
 interface Props {
   onComplete: () => void;
   onResult: (answer: string, correct: boolean) => void;
+  language: Language;
 }
 
-export default function ReorderingStage({ onComplete, onResult }: Props) {
+export default function ReorderingStage({ onComplete, onResult, language }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
   const clip = GAME_CLIPS.sixEight;
 
-  // Create 6 segments with labels, shown in random order
   const shuffledSegments = useMemo(() => {
     const segments = [1, 2, 3, 4, 5, 6];
     const shuffled = [...segments];
@@ -47,13 +39,12 @@ export default function ReorderingStage({ onComplete, onResult }: Props) {
       className="mx-auto max-w-5xl px-4 py-8"
     >
       <div className="mb-6 rounded-xl border border-border bg-surface p-6 shadow-sm">
-        <h2 className="mb-2 text-2xl font-bold text-foreground">Reordering Task</h2>
+        <h2 className="mb-2 text-2xl font-bold text-foreground">{t(language, gameCopy.reordering.title)}</h2>
         <p className="leading-relaxed text-muted-foreground">
-          The "6 8" clip has been divided into 6 segments shown below. Select the option that shows the correct chronological order of these segments.
+          {t(language, gameCopy.reordering.description)}
         </p>
       </div>
 
-      {/* Segment images shown in random order with number labels */}
       <div className="mb-6 grid grid-cols-3 gap-3 sm:grid-cols-6">
         {shuffledSegments.map((segNum) => (
           <div
@@ -75,7 +66,6 @@ export default function ReorderingStage({ onComplete, onResult }: Props) {
         ))}
       </div>
 
-      {/* Options grid */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {REORDERING_OPTIONS.map((opt) => {
           const isCorrect = opt.label === CORRECT_REORDERING;
@@ -87,12 +77,12 @@ export default function ReorderingStage({ onComplete, onResult }: Props) {
               whileTap={{ scale: 0.96 }}
               onClick={() => handleSelect(opt.label)}
               disabled={!!selected}
-              className={`relative rounded-lg border-2 p-3 text-left transition-all ${
+              className={`relative rounded-lg border-2 bg-surface p-3 text-left transition-all ${
                 showResult && isCorrect
                   ? "border-success bg-success/5"
                   : showResult && isSelected && !isCorrect
-                  ? "border-destructive bg-destructive/5"
-                  : "border-border hover:border-primary/50 bg-surface"
+                    ? "border-destructive bg-destructive/5"
+                    : "border-border hover:border-primary/50"
               }`}
               aria-label={`Option ${opt.label}: ${opt.sequence.join(", ")}`}
             >
@@ -117,13 +107,13 @@ export default function ReorderingStage({ onComplete, onResult }: Props) {
       </div>
 
       {selected && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-6 flex items-center justify-between">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-6 flex items-center justify-between gap-4">
           <p className="text-base text-muted-foreground">
             {selected === CORRECT_REORDERING
-              ? "✅ Correct! The right sequence is option G."
-              : `❌ Incorrect. The correct answer was G (${REORDERING_OPTIONS.find(o => o.label === CORRECT_REORDERING)?.sequence.join(" → ")}).`}
+              ? t(language, gameCopy.reordering.correct)
+              : `${t(language, gameCopy.reordering.incorrectPrefix)} (${REORDERING_OPTIONS.find((o) => o.label === CORRECT_REORDERING)?.sequence.join(" → ")}).`}
           </p>
-          <Button onClick={onComplete} size="lg">Continue</Button>
+          <Button onClick={onComplete} size="lg">{t(language, gameCopy.reordering.continue)}</Button>
         </motion.div>
       )}
     </motion.div>

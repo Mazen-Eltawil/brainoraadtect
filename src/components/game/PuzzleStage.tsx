@@ -3,10 +3,12 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { PUZZLE_ASSETS, GRID_MAP, START_POS, CHEST_POS, KEY_POS, SAFE_SAND_TILES, TileType } from "@/config/puzzleConfig";
 import { PuzzleRunLog } from "@/types/game";
+import { gameCopy, Language, t } from "@/lib/gameCopy";
 
 interface Props {
   onComplete: () => void;
   onResult: (run: PuzzleRunLog) => void;
+  language: Language;
 }
 
 type PuzzleStatus = "idle" | "playing" | "success" | "fail_crab" | "fail_no_key" | "fail_incomplete";
@@ -43,13 +45,13 @@ function reducer(state: PuzzleState, action: PuzzleAction): PuzzleState {
     case "MOVE": {
       if (state.status !== "playing" || !state.currentPos) return state;
       const pos = action.pos;
-      
+
       if (!isAdjacent(state.currentPos, pos)) return state;
-      if (state.path.some(p => posEq(p, pos))) return state;
+      if (state.path.some((p) => posEq(p, pos))) return state;
 
       const tileType = GRID_MAP[pos[0]][pos[1]];
       const newPath = [...state.path, pos];
-      
+
       if (tileType === "crab") {
         return { ...state, path: newPath, currentPos: pos, status: "fail_crab" };
       }
@@ -60,7 +62,7 @@ function reducer(state: PuzzleState, action: PuzzleAction): PuzzleState {
         if (!newHasKey) {
           return { ...state, path: newPath, currentPos: pos, hasKey: newHasKey, status: "fail_no_key" };
         }
-        const visitedSand = SAFE_SAND_TILES.every(st => newPath.some(p => posEq(p, st)));
+        const visitedSand = SAFE_SAND_TILES.every((st) => newPath.some((p) => posEq(p, st)));
         if (!visitedSand) {
           return { ...state, path: newPath, currentPos: pos, hasKey: newHasKey, status: "fail_incomplete" };
         }
@@ -81,7 +83,7 @@ const TILE_IMAGES: Partial<Record<TileType, string>> = {
   key: PUZZLE_ASSETS.key,
 };
 
-export default function PuzzleStage({ onComplete, onResult }: Props) {
+export default function PuzzleStage({ onComplete, onResult, language }: Props) {
   const [state, dispatch] = useReducer(reducer, {
     currentPos: null,
     path: [],
@@ -115,15 +117,15 @@ export default function PuzzleStage({ onComplete, onResult }: Props) {
   }, []);
 
   const isFinished = ["success", "fail_crab", "fail_no_key", "fail_incomplete"].includes(state.status);
-  const visitedSandCount = SAFE_SAND_TILES.filter(st => state.path.some(p => posEq(p, st))).length;
+  const visitedSandCount = SAFE_SAND_TILES.filter((st) => state.path.some((p) => posEq(p, st))).length;
 
-  const statusMessages: Record<string, string> = {
-    idle: "Click the START tile to begin.",
-    playing: "Navigate to the treasure chest!",
-    success: "🎉 Congratulations! Puzzle completed successfully!",
-    fail_crab: "🦀 You stepped on a crab. Puzzle failed.",
-    fail_no_key: "🔒 Chest is locked — you did not collect the key.",
-    fail_incomplete: "⚠️ You haven't visited all sand tiles yet.",
+  const statusMessages: Record<PuzzleStatus, string> = {
+    idle: t(language, gameCopy.puzzle.status.idle),
+    playing: t(language, gameCopy.puzzle.status.playing),
+    success: t(language, gameCopy.puzzle.status.success),
+    fail_crab: t(language, gameCopy.puzzle.status.fail_crab),
+    fail_no_key: t(language, gameCopy.puzzle.status.fail_no_key),
+    fail_incomplete: t(language, gameCopy.puzzle.status.fail_incomplete),
   };
 
   return (
@@ -133,7 +135,6 @@ export default function PuzzleStage({ onComplete, onResult }: Props) {
       className="mx-auto max-w-5xl px-4 py-8"
     >
       <div className="grid gap-8 lg:grid-cols-[1fr_auto]">
-        {/* Grid */}
         <div className="flex flex-col items-center">
           <div
             className="grid grid-cols-3 grid-rows-3 gap-1 rounded-xl p-4"
@@ -145,7 +146,7 @@ export default function PuzzleStage({ onComplete, onResult }: Props) {
           >
             {GRID_MAP.flatMap((row, r) =>
               row.map((tileType, c) => {
-                const isVisited = state.path.some(p => posEq(p, [r, c]));
+                const isVisited = state.path.some((p) => posEq(p, [r, c]));
                 const isCurrent = state.currentPos && posEq(state.currentPos, [r, c]);
                 const tileImg = TILE_IMAGES[tileType];
                 const isClickable =
@@ -162,10 +163,10 @@ export default function PuzzleStage({ onComplete, onResult }: Props) {
                     whileTap={isClickable ? { scale: 0.96 } : {}}
                     className={`relative flex items-center justify-center rounded-lg border transition-all ${
                       isCurrent
-                        ? "border-primary ring-2 ring-primary/30 bg-primary/10"
+                        ? "border-primary bg-primary/10 ring-2 ring-primary/30"
                         : isVisited
-                        ? "border-border/50 bg-foreground/5 opacity-50"
-                        : "border-border/30 bg-surface/80"
+                          ? "border-border/50 bg-foreground/5 opacity-50"
+                          : "border-border/30 bg-surface/80"
                     } ${isClickable ? "cursor-pointer hover:shadow-md" : "cursor-default"}`}
                     style={{ width: 140, height: 140 }}
                     aria-label={`${tileType} tile at Row ${r + 1} Column ${c + 1}`}
@@ -182,7 +183,7 @@ export default function PuzzleStage({ onComplete, onResult }: Props) {
                     {isVisited && !isCurrent && (
                       <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-foreground/10">
                         <span className="text-xs font-bold text-muted-foreground">
-                          {state.path.findIndex(p => posEq(p, [r, c])) + 1}
+                          {state.path.findIndex((p) => posEq(p, [r, c])) + 1}
                         </span>
                       </div>
                     )}
@@ -191,7 +192,6 @@ export default function PuzzleStage({ onComplete, onResult }: Props) {
               })
             )}
           </div>
-          {/* Path line SVG overlay */}
           {state.path.length > 1 && (
             <svg
               className="pointer-events-none absolute"
@@ -211,26 +211,25 @@ export default function PuzzleStage({ onComplete, onResult }: Props) {
           )}
         </div>
 
-        {/* Rules & Status */}
         <div className="w-72 space-y-4">
           <div className="rounded-xl border border-border bg-surface p-4 shadow-sm">
-            <h3 className="mb-2 text-sm font-bold uppercase tracking-widest text-muted-foreground">Rules</h3>
+            <h3 className="mb-2 text-sm font-bold uppercase tracking-widest text-muted-foreground">{t(language, gameCopy.puzzle.rules)}</h3>
             <ul className="space-y-1.5 text-sm leading-relaxed text-foreground">
-              <li>• Start on the START tile</li>
-              <li>• Move to any adjacent tile (including diagonals)</li>
-              <li>• No revisiting tiles</li>
-              <li>• Visit all sand tiles</li>
-              <li>• Avoid crabs 🦀</li>
-              <li>• Collect the key before the chest</li>
+              <li>{t(language, gameCopy.puzzle.ruleStart)}</li>
+              <li>{t(language, gameCopy.puzzle.ruleAdjacent)}</li>
+              <li>{t(language, gameCopy.puzzle.ruleNoRevisit)}</li>
+              <li>{t(language, gameCopy.puzzle.ruleSand)}</li>
+              <li>{t(language, gameCopy.puzzle.ruleCrabs)}</li>
+              <li>{t(language, gameCopy.puzzle.ruleKey)}</li>
             </ul>
           </div>
 
-          <div className="rounded-xl border border-border bg-surface p-4 shadow-sm space-y-2">
+          <div className="space-y-2 rounded-xl border border-border bg-surface p-4 shadow-sm">
             <p className="text-sm text-muted-foreground">
-              Sand tiles: <strong className="text-foreground">{visitedSandCount}/{SAFE_SAND_TILES.length}</strong>
+              {t(language, gameCopy.puzzle.sandTiles)}: <strong className="text-foreground">{visitedSandCount}/{SAFE_SAND_TILES.length}</strong>
             </p>
             <p className="text-sm text-muted-foreground">
-              Key: <strong className="text-foreground">{state.hasKey ? "✅ Collected" : "❌ Not collected"}</strong>
+              {t(language, gameCopy.puzzle.key)}: <strong className="text-foreground">{state.hasKey ? t(language, gameCopy.puzzle.collected) : t(language, gameCopy.puzzle.notCollected)}</strong>
             </p>
             <p className="text-sm font-medium text-foreground">{statusMessages[state.status]}</p>
           </div>
@@ -238,10 +237,10 @@ export default function PuzzleStage({ onComplete, onResult }: Props) {
           {isFinished && (
             <div className="flex gap-2">
               <Button onClick={handleRetry} variant="outline" className="flex-1">
-                Retry
+                {t(language, gameCopy.puzzle.retry)}
               </Button>
               <Button onClick={handleFinish} className="flex-1">
-                Continue
+                {t(language, gameCopy.puzzle.continue)}
               </Button>
             </div>
           )}

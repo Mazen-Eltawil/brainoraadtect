@@ -1,13 +1,16 @@
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { GAME_CLIPS, CLIP_ORDER } from "@/config/videoConfig";
 import { CheckCircle, XCircle } from "lucide-react";
 import { ResponseLog } from "@/types/game";
+import { gameCopy, Language, t } from "@/lib/gameCopy";
 
 interface Props {
   onComplete: () => void;
   onLogResponse: (r: ResponseLog) => void;
+  language: Language;
+  isMuted: boolean;
 }
 
 function shuffleArray<T>(arr: T[]): T[] {
@@ -19,21 +22,29 @@ function shuffleArray<T>(arr: T[]): T[] {
   return a;
 }
 
-export default function LongTermMemory({ onComplete, onLogResponse }: Props) {
+export default function LongTermMemory({ onComplete, onLogResponse, language, isMuted }: Props) {
   const [qIndex, setQIndex] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const startTimeRef = useRef(Date.now());
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const questions = useMemo(() => {
     return CLIP_ORDER.map((key) => {
       const correct = GAME_CLIPS[key];
-      const allLabels = CLIP_ORDER.map(k => GAME_CLIPS[k].label);
+      const allLabels = CLIP_ORDER.map((k) => GAME_CLIPS[k].label);
       const options = shuffleArray(allLabels);
       return { clipKey: key, clipSrc: correct.src, correctLabel: correct.label, options };
     });
   }, []);
 
   const q = questions[qIndex];
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = isMuted;
+      void videoRef.current.play().catch(() => {});
+    }
+  }, [isMuted, q.clipKey]);
 
   const handleSelect = useCallback((label: string) => {
     if (selected) return;
@@ -66,15 +77,17 @@ export default function LongTermMemory({ onComplete, onLogResponse }: Props) {
       className="mx-auto max-w-3xl px-4 py-8"
     >
       <div className="mb-6 rounded-xl border border-border bg-surface p-6 shadow-sm">
-        <p className="mb-2 text-sm tracking-widest uppercase text-muted-foreground">
-          Watch the clip and select the correct label
+        <p className="mb-2 text-sm uppercase tracking-widest text-muted-foreground">
+          {t(language, gameCopy.longTerm.prompt)}
         </p>
         <video
+          ref={videoRef}
           key={q.clipKey}
           src={q.clipSrc}
           className="aspect-video w-full rounded-lg border border-border"
           playsInline
           autoPlay
+          muted={isMuted}
           controls={false}
         />
       </div>
@@ -94,8 +107,8 @@ export default function LongTermMemory({ onComplete, onLogResponse }: Props) {
                 showResult && isCorrect
                   ? "border-success bg-success/5 text-foreground"
                   : showResult && isSelected && !isCorrect
-                  ? "border-destructive bg-destructive/5 text-foreground"
-                  : "border-border bg-surface text-foreground hover:border-primary/50"
+                    ? "border-destructive bg-destructive/5 text-foreground"
+                    : "border-border bg-surface text-foreground hover:border-primary/50"
               }`}
               aria-label={`Select ${label}`}
             >
@@ -110,13 +123,15 @@ export default function LongTermMemory({ onComplete, onLogResponse }: Props) {
       {selected && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-6 flex justify-end">
           <Button onClick={handleNext} size="lg">
-            {qIndex + 1 < questions.length ? "Next Question" : "View Results"}
+            {qIndex + 1 < questions.length
+              ? t(language, gameCopy.longTerm.nextQuestion)
+              : t(language, gameCopy.longTerm.viewResults)}
           </Button>
         </motion.div>
       )}
 
       <p className="mt-4 text-center text-sm text-muted-foreground">
-        Question {qIndex + 1} of {questions.length}
+        {t(language, gameCopy.longTerm.question)} {qIndex + 1} {t(language, gameCopy.longTerm.of)} {questions.length}
       </p>
     </motion.div>
   );
