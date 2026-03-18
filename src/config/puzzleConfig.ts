@@ -24,7 +24,6 @@ export const CHEST_POS: [number, number] = [0, 2];
 export const KEY_POS: [number, number] = [2, 2];
 
 export const SAFE_SAND_TILES: [number, number][] = [
-  [0, 0],
   [1, 0],
   [1, 1],
   [1, 2],
