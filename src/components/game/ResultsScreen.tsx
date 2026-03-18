@@ -1,15 +1,17 @@
 import { motion } from "framer-motion";
 import { GameSession } from "@/types/game";
+import { gameCopy, Language, t } from "@/lib/gameCopy";
 
 interface Props {
   session: GameSession;
+  language: Language;
 }
 
-export default function ResultsScreen({ session }: Props) {
-  const shortTermResponses = session.responses.filter(r => r.stage === "short_term");
-  const longTermResponses = session.responses.filter(r => r.stage === "long_term");
-  const stCorrect = shortTermResponses.filter(r => r.isCorrect).length;
-  const ltCorrect = longTermResponses.filter(r => r.isCorrect).length;
+export default function ResultsScreen({ session, language }: Props) {
+  const shortTermResponses = session.responses.filter((r) => r.stage === "short_term");
+  const longTermResponses = session.responses.filter((r) => r.stage === "long_term");
+  const stCorrect = shortTermResponses.filter((r) => r.isCorrect).length;
+  const ltCorrect = longTermResponses.filter((r) => r.isCorrect).length;
   const puzzleSuccess = session.puzzleRun?.success ?? false;
   const reorderCorrect = session.reorderingCorrect;
 
@@ -22,39 +24,41 @@ export default function ResultsScreen({ session }: Props) {
       animate={{ opacity: 1, y: 0 }}
       className="mx-auto max-w-2xl px-4 py-8"
     >
-      <div className="rounded-xl border border-border bg-surface p-8 shadow-md text-center">
-        <h2 className="mb-2 text-3xl font-bold text-foreground">Assessment Complete</h2>
-        <p className="mb-6 text-muted-foreground">Player: {session.playerId}</p>
+      <div className="rounded-xl border border-border bg-surface p-8 text-center shadow-md">
+        <h2 className="mb-2 text-3xl font-bold text-foreground">{t(language, gameCopy.results.title)}</h2>
+        <p className="mb-6 text-muted-foreground">{t(language, gameCopy.results.player)}: {session.playerId}</p>
 
         <div className="mb-8 rounded-lg bg-primary/10 p-6">
-          <p className="text-sm uppercase tracking-widest text-muted-foreground">Composite Score</p>
+          <p className="text-sm uppercase tracking-widest text-muted-foreground">{t(language, gameCopy.results.compositeScore)}</p>
           <p className="text-5xl font-bold text-primary">{totalScore}/{maxScore}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-4 text-left">
           <ScoreCard
-            title="Short-Term Memory"
+            title={t(language, gameCopy.results.shortTerm)}
             score={stCorrect}
             total={shortTermResponses.length}
-            avgTime={avg(shortTermResponses.map(r => r.responseTimeMs))}
+            avgTime={avg(shortTermResponses.map((r) => r.responseTimeMs))}
+            language={language}
           />
           <ScoreCard
-            title="Long-Term Memory"
+            title={t(language, gameCopy.results.longTerm)}
             score={ltCorrect}
             total={longTermResponses.length}
-            avgTime={avg(longTermResponses.map(r => r.responseTimeMs))}
+            avgTime={avg(longTermResponses.map((r) => r.responseTimeMs))}
+            language={language}
           />
           <div className="rounded-lg border border-border p-4">
-            <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Reordering</p>
-            <p className="mt-1 text-2xl font-bold text-foreground">{reorderCorrect ? "✅ Correct" : "❌ Incorrect"}</p>
-            <p className="text-sm text-muted-foreground">Answer: {session.reorderingAnswer ?? "—"}</p>
+            <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">{t(language, gameCopy.results.reordering)}</p>
+            <p className="mt-1 text-2xl font-bold text-foreground">{reorderCorrect ? t(language, gameCopy.results.correct) : t(language, gameCopy.results.incorrect)}</p>
+            <p className="text-sm text-muted-foreground">{t(language, gameCopy.results.answer)}: {session.reorderingAnswer ?? "—"}</p>
           </div>
           <div className="rounded-lg border border-border p-4">
-            <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Puzzle</p>
-            <p className="mt-1 text-2xl font-bold text-foreground">{puzzleSuccess ? "✅ Solved" : "❌ Failed"}</p>
+            <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">{t(language, gameCopy.results.puzzle)}</p>
+            <p className="mt-1 text-2xl font-bold text-foreground">{puzzleSuccess ? t(language, gameCopy.results.solved) : t(language, gameCopy.results.failed)}</p>
             <p className="text-sm text-muted-foreground">
               {session.puzzleRun
-                ? `${session.puzzleRun.path.length} steps · ${(session.puzzleRun.durationMs / 1000).toFixed(1)}s`
+                ? `${session.puzzleRun.path.length} steps · ${(session.puzzleRun.durationMs / 1000).toFixed(1)}${t(language, gameCopy.results.secondsShort)}`
                 : "—"}
             </p>
           </div>
@@ -64,12 +68,26 @@ export default function ResultsScreen({ session }: Props) {
   );
 }
 
-function ScoreCard({ title, score, total, avgTime }: { title: string; score: number; total: number; avgTime: number }) {
+function ScoreCard({
+  title,
+  score,
+  total,
+  avgTime,
+  language,
+}: {
+  title: string;
+  score: number;
+  total: number;
+  avgTime: number;
+  language: Language;
+}) {
   return (
     <div className="rounded-lg border border-border p-4">
       <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">{title}</p>
       <p className="mt-1 text-2xl font-bold text-foreground">{score}/{total}</p>
-      <p className="text-sm text-muted-foreground">Avg: {avgTime > 0 ? `${(avgTime / 1000).toFixed(1)}s` : "—"}</p>
+      <p className="text-sm text-muted-foreground">
+        {t(language, gameCopy.results.avg)}: {avgTime > 0 ? `${(avgTime / 1000).toFixed(1)}${t(language, gameCopy.results.secondsShort)}` : "—"}
+      </p>
     </div>
   );
 }
