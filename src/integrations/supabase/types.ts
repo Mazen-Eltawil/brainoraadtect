@@ -14,7 +14,167 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      aq_assessments: {
+        Row: {
+          answers_json: Json
+          created_at: string
+          id: string
+          interpretation: string
+          total_score: number
+          user_id: string
+        }
+        Insert: {
+          answers_json: Json
+          created_at?: string
+          id?: string
+          interpretation: string
+          total_score: number
+          user_id: string
+        }
+        Update: {
+          answers_json?: Json
+          created_at?: string
+          id?: string
+          interpretation?: string
+          total_score?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      game_responses: {
+        Row: {
+          created_at: string
+          id: string
+          is_correct: boolean
+          response_time_ms: number
+          selected: string
+          session_id: string
+          stage: string
+          target: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_correct: boolean
+          response_time_ms: number
+          selected: string
+          session_id: string
+          stage: string
+          target: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_correct?: boolean
+          response_time_ms?: number
+          selected?: string
+          session_id?: string
+          stage?: string
+          target?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_responses_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "game_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_sessions: {
+        Row: {
+          created_at: string
+          end_time: string | null
+          id: string
+          long_term_score: number | null
+          long_term_total: number | null
+          max_score: number | null
+          puzzle_duration_ms: number | null
+          puzzle_path: Json | null
+          puzzle_steps: number | null
+          puzzle_success: boolean | null
+          reordering_answer: string | null
+          reordering_correct: boolean | null
+          short_term_score: number | null
+          short_term_total: number | null
+          start_time: string
+          total_score: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          long_term_score?: number | null
+          long_term_total?: number | null
+          max_score?: number | null
+          puzzle_duration_ms?: number | null
+          puzzle_path?: Json | null
+          puzzle_steps?: number | null
+          puzzle_success?: boolean | null
+          reordering_answer?: string | null
+          reordering_correct?: boolean | null
+          short_term_score?: number | null
+          short_term_total?: number | null
+          start_time?: string
+          total_score?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          long_term_score?: number | null
+          long_term_total?: number | null
+          max_score?: number | null
+          puzzle_duration_ms?: number | null
+          puzzle_path?: Json | null
+          puzzle_steps?: number | null
+          puzzle_success?: boolean | null
+          reordering_answer?: string | null
+          reordering_correct?: boolean | null
+          short_term_score?: number | null
+          short_term_total?: number | null
+          start_time?: string
+          total_score?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          aq_completed: boolean
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          theme_preference: string
+          updated_at: string
+        }
+        Insert: {
+          aq_completed?: boolean
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id: string
+          theme_preference?: string
+          updated_at?: string
+        }
+        Update: {
+          aq_completed?: boolean
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          theme_preference?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

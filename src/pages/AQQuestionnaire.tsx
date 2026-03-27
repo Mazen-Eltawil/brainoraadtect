@@ -1,0 +1,138 @@
+import { useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { AQ_QUESTIONS, computeAQScore } from "@/config/aqQuestions";
+import { gameCopy, Language, t } from "@/lib/gameCopy";
+import { supabase } from "@/integrations/supabase/client";
+import StageIntro from "@/components/game/StageIntro";
+
+interface Props {
+  language: Language;
+  userId: string;
+  onComplete: () => void;
+}
+
+export default function AQQuestionnaire({ language, userId, onComplete }: Props) {
+  const [answers, setAnswers] = useState<Record<number, boolean>>({});
+  const [submitted, setSubmitted] = useState(false);
+  const [result, setResult] = useState<{ total: number; interpretation: string } | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  const allAnswered = AQ_QUESTIONS.every((q) => answers[q.id] !== undefined);
+
+  const handleAnswer = useCallback((id: number, val: boolean) => {
+    setAnswers((prev) => ({ ...prev, [id]: val }));
+  }, []);
+
+  const handleSubmit = useCallback(async () => {
+    if (!allAnswered) return;
+    setSaving(true);
+    const score = computeAQScore(answers);
+    setResult(score);
+
+    try {
+      await supabase.from("aq_assessments").insert({
+        user_id: userId,
+        total_score: score.total,
+        interpretation: score.interpretation,
+        answers_json: answers,
+      } as any);
+      await supabase.from("profiles").update({ aq_completed: true } as any).eq("id", userId);
+    } catch (e) {
+      console.error("Error saving AQ:", e);
+    }
+    setSaving(false);
+    setSubmitted(true);
+  }, [allAnswered, answers, userId]);
+
+  if (submitted && result) {
+    const interpKey = result.interpretation as keyof typeof gameCopy.questionnaire.interpretation;
+    return (
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex min-h-[60vh] items-center justify-center px-4">
+        <div className="w-full max-w-md rounded-2xl border border-border bg-surface p-8 text-center shadow-lg">
+          <h2 className="mb-3 text-2xl font-bold text-foreground">{t(language, gameCopy.questionnaire.resultTitle)}</h2>
+          <div className="mb-4 rounded-lg bg-primary/10 p-6">
+            <p className="text-5xl font-bold text-primary">{result.total}/27</p>
+          </div>
+          <p className="mb-6 text-base text-muted-foreground">
+            {t(language, gameCopy.questionnaire.interpretation[interpKey])}
+          </p>
+          <Button onClick={onComplete} size="lg" className="h-12 w-full">
+            {t(language, gameCopy.questionnaire.continue)}
+          </Button>
+        </div>
+      </motion.div>
+    );
+  }
+
+  // Group questions by category
+  const categories = [...new Set(AQ_QUESTIONS.map((q) => q.category))];
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-3xl px-4 py-8">
+      <StageIntro
+        title={t(language, gameCopy.questionnaire.stageTitle)}
+        description={t(language, gameCopy.questionnaire.stageDescription)}
+        audioSrc="/audio/questionnaire.mp3"
+        language={language}
+      />
+
+      <div className="space-y-6">
+        {categories.map((cat) => (
+          <div key={cat} className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+            <h3 className="mb-4 text-sm font-bold uppercase tracking-widest text-primary">{cat}</h3>
+            <div className="space-y-4">
+              <AnimatePresence>
+                {AQ_QUESTIONS.filter((q) => q.category === cat).map((q, idx) => (
+                  <motion.div
+                    key={q.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                    className="flex items-start gap-4 rounded-lg border border-border/50 p-4"
+                  >
+                    <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                      {q.id}
+                    </span>
+                    <div className="flex-1">
+                      <p className="text-sm leading-relaxed text-foreground">{q.text[language]}</p>
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        ({q.weight} {q.weight === 1 ? "point" : "points"})
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleAnswer(q.id, true)}
+                        className={`rounded-lg border-2 px-4 py-1.5 text-sm font-semibold transition-all ${
+                          answers[q.id] === true ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground hover:border-primary/50"
+                        }`}
+                      >
+                        {t(language, gameCopy.questionnaire.yes)}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleAnswer(q.id, false)}
+                        className={`rounded-lg border-2 px-4 py-1.5 text-sm font-semibold transition-all ${
+                          answers[q.id] === false ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground hover:border-primary/50"
+                        }`}
+                      >
+                        {t(language, gameCopy.questionnaire.no)}
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-8 flex justify-center">
+        <Button onClick={handleSubmit} disabled={!allAnswered || saving} size="lg" className="h-14 px-12 text-lg">
+          {saving ? "..." : t(language, gameCopy.questionnaire.submit)}
+        </Button>
+      </div>
+    </motion.div>
+  );
+}
