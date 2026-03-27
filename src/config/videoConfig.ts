@@ -19,3 +19,20 @@ export const DISTRACTOR_CLIPS: ClipConfig[] = [
 
 export const CLIP_ORDER = ["fasla", "sixEight", "money", "marshmallow"] as const;
 export const REPS_PER_CLIP = 3;
+
+/** Audio files per clip for the short-term memory intro */
+export const CLIP_AUDIO: Record<string, string> = {
+  fasla: "/audio/stage2-fasla.mp3",
+  sixEight: "/audio/stage2-6-8.mp3",
+  money: "/audio/stage2-money.mp3",
+  marshmallow: "/audio/stage2-marshmallow.mp3",
+};
+
+export const SIX_EIGHT_SEGMENTS = [
+  { id: 1, src: "/segments/6-8-1.png" },
+  { id: 2, src: "/segments/6-8-2.png" },
+  { id: 3, src: "/segments/6-8-3.png" },
+  { id: 4, src: "/segments/6-8-4.png" },
+  { id: 5, src: "/segments/6-8-5.png" },
+  { id: 6, src: "/segments/6-8-6.png" },
+];

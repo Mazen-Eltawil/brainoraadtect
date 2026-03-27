@@ -29,8 +29,8 @@ export const stageLabels: Record<Language, Record<GameStage, string>> = {
 
 export const gameCopy = {
   appTitle: {
-    en: "Fasla Cognitive Game",
-    ar: "لعبة فراسلا الإدراكية",
+    en: "Brainaura Detect",
+    ar: "Brainaura Detect",
   },
   topBar: {
     id: { en: "ID", ar: "المعرف" },
@@ -39,51 +39,61 @@ export const gameCopy = {
     unmute: { en: "Unmute", ar: "تشغيل الصوت" },
   },
   onboarding: {
-    title: { en: "Welcome", ar: "مرحباً" },
+    title: { en: "Welcome to Brainaura Detect", ar: "مرحبًا بك في Brainaura Detect" },
     description: {
-      en: "This cognitive assessment tests memory, sequencing, and problem-solving through interactive game stages. Enter your Player ID to begin.",
-      ar: "يقيس هذا التقييم الإدراكي الذاكرة والتسلسل وحل المشكلات عبر مراحل تفاعلية. أدخل معرف اللاعب للبدء.",
+      en: "Brainaura Detect is an interactive cognitive assessment that evaluates your memory, sequencing, and problem-solving abilities through engaging dance movement videos, puzzles, and a clinically-validated questionnaire. The assessment takes about 15 minutes and is designed to be both fun and insightful.",
+      ar: "Brainaura Detect هو تقييم إدراكي تفاعلي يقيّم ذاكرتك وقدرتك على التسلسل وحل المشكلات من خلال مقاطع فيديو رقص تفاعلية وألغاز واستبيان معتمد إكلينيكياً. يستغرق التقييم حوالي 15 دقيقة.",
     },
-    placeholder: { en: "Enter Player ID", ar: "أدخل معرف اللاعب" },
+    playIntro: { en: "Play Intro Audio", ar: "تشغيل صوت المقدمة" },
     button: { en: "Start Assessment", ar: "ابدأ التقييم" },
   },
+  stageIntro: {
+    playAudio: { en: "Play Instructions", ar: "تشغيل التعليمات" },
+    playing: { en: "Playing…", ar: "جارٍ التشغيل…" },
+  },
   learning: {
+    stageTitle: { en: "Stage 1 – Learning Phase", ar: "المرحلة 1 – مرحلة التعلّم" },
+    stageDescription: {
+      en: "You will watch 4 different dance movement clips. Each clip will play 3 times so you can memorize the movement and its name. After each clip's 3 repetitions, you'll be tested on it immediately.",
+      ar: "ستشاهد 4 مقاطع رقص مختلفة. سيتم تشغيل كل مقطع 3 مرات حتى تتمكن من حفظ الحركة واسمها. بعد كل 3 تكرارات ستُختبر فوراً.",
+    },
     instructionsLabel: { en: "Instructions", ar: "التعليمات" },
     instructions: {
-      en: "You will see 4 dancing clips: Fasla, 6 8, Money, Marshmallow. Watch each dancing video 3 times carefully — you will be tested later.",
-      ar: "ستشاهد 4 مقاطع رقص: Fasla و 6 8 و Money و Marshmallow. شاهد كل فيديو رقص 3 مرات بعناية لأنك ستُختبر لاحقاً.",
+      en: "Watch each dancing video 3 times carefully — you will be tested on it right after.",
+      ar: "شاهد كل فيديو رقص 3 مرات بعناية — ستُختبر عليه مباشرة بعد ذلك.",
     },
     nowLearning: { en: "Now learning:", ar: "تتعلم الآن:" },
-    remember: {
-      en: "Watch the movement and remember the label.",
-      ar: "شاهد الحركة وتذكّر الاسم.",
-    },
+    remember: { en: "Watch the movement and remember the label.", ar: "شاهد الحركة وتذكّر الاسم." },
     clipCounter: { en: "Clip", ar: "المقطع" },
     repetition: { en: "Repetition", ar: "التكرار" },
     playClip: { en: "Play Clip", ar: "تشغيل المقطع" },
     playAgain: { en: "Play Again", ar: "أعد التشغيل" },
     learnedTitle: { en: "All Clips Learned!", ar: "تمت مشاهدة جميع المقاطع!" },
     learnedDescription: {
-      en: "You've watched all 4 movement clips. Click Next to continue to the memory tests.",
-      ar: "لقد شاهدت جميع مقاطع الحركات الأربعة. اضغط التالي للمتابعة إلى اختبارات الذاكرة.",
+      en: "You've watched all 4 movement clips and completed their immediate memory tests. Click Next to continue.",
+      ar: "لقد شاهدت جميع المقاطع الأربعة وأكملت اختبارات الذاكرة الفورية. اضغط التالي للمتابعة.",
     },
     next: { en: "Next", ar: "التالي" },
   },
   shortTerm: {
-    prompt: {
-      en: "Which movement matches this name?",
-      ar: "أي حركة تطابق هذا الاسم؟",
+    stageTitle: { en: "Short-Term Memory Test", ar: "اختبار الذاكرة قصيرة المدى" },
+    stageDescription: {
+      en: "Now identify the clip you just watched. Select the correct movement from the options below.",
+      ar: "الآن حدد المقطع الذي شاهدته للتو. اختر الحركة الصحيحة من الخيارات أدناه.",
     },
-    helper: {
-      en: "Click the correct movement clip below.",
-      ar: "اضغط على مقطع الحركة الصحيح بالأسفل.",
-    },
+    prompt: { en: "Which movement matches this name?", ar: "أي حركة تطابق هذا الاسم؟" },
+    helper: { en: "Click the correct movement clip below.", ar: "اضغط على مقطع الحركة الصحيح بالأسفل." },
     nextQuestion: { en: "Next Question", ar: "السؤال التالي" },
     continue: { en: "Continue", ar: "متابعة" },
     question: { en: "Question", ar: "السؤال" },
     of: { en: "of", ar: "من" },
   },
   reordering: {
+    stageTitle: { en: "Stage 3 – Reordering Task", ar: "المرحلة 3 – مهمة الترتيب" },
+    stageDescription: {
+      en: "The '6 8' clip has been divided into 6 segments. Put them in the correct chronological order.",
+      ar: "تم تقسيم مقطع '6 8' إلى 6 أجزاء. رتبها بالترتيب الزمني الصحيح.",
+    },
     title: { en: "Reordering Task", ar: "مهمة الترتيب" },
     description: {
       en: 'The "6 8" clip has been divided into 6 segments shown below. Select the option that shows the correct chronological order of these segments.',
@@ -94,12 +104,14 @@ export const gameCopy = {
     continue: { en: "Continue", ar: "متابعة" },
   },
   puzzle: {
+    stageTitle: { en: "Stage 4 – Puzzle", ar: "المرحلة 4 – اللغز" },
+    stageDescription: {
+      en: "Navigate the 3×3 grid from START to the treasure chest. Collect the key first and avoid crabs!",
+      ar: "تنقل في الشبكة 3×3 من البداية إلى صندوق الكنز. اجمع المفتاح أولاً وتجنب السرطانات!",
+    },
     rules: { en: "Rules", ar: "القواعد" },
     ruleStart: { en: "• Start on the START tile", ar: "• ابدأ من خانة START" },
-    ruleAdjacent: {
-      en: "• Move to any adjacent tile (including diagonals)",
-      ar: "• تحرك إلى أي خانة مجاورة بما في ذلك القطرية",
-    },
+    ruleAdjacent: { en: "• Move to any adjacent tile (including diagonals)", ar: "• تحرك إلى أي خانة مجاورة بما في ذلك القطرية" },
     ruleNoRevisit: { en: "• No revisiting tiles", ar: "• ممنوع زيارة نفس الخانة مرة أخرى" },
     ruleSand: { en: "• Visit all sand tiles", ar: "• زر جميع خانات الرمل" },
     ruleCrabs: { en: "• Avoid crabs 🦀", ar: "• تجنب السرطانات 🦀" },
@@ -120,10 +132,12 @@ export const gameCopy = {
     },
   },
   longTerm: {
-    prompt: {
-      en: "Watch the clip and select the correct label",
-      ar: "شاهد المقطع واختر الاسم الصحيح",
+    stageTitle: { en: "Stage 5 – Long-Term Memory", ar: "المرحلة 5 – الذاكرة طويلة المدى" },
+    stageDescription: {
+      en: "Watch each clip and recall its name from earlier. This tests how well you retained the movement names.",
+      ar: "شاهد كل مقطع وتذكر اسمه من وقت سابق. هذا يختبر مدى احتفاظك بأسماء الحركات.",
     },
+    prompt: { en: "Watch the clip and select the correct label", ar: "شاهد المقطع واختر الاسم الصحيح" },
     nextQuestion: { en: "Next Question", ar: "السؤال التالي" },
     viewResults: { en: "View Results", ar: "عرض النتائج" },
     question: { en: "Question", ar: "السؤال" },
@@ -144,5 +158,54 @@ export const gameCopy = {
     answer: { en: "Answer", ar: "الإجابة" },
     avg: { en: "Avg", ar: "المتوسط" },
     secondsShort: { en: "s", ar: "ث" },
+    savingResults: { en: "Saving results…", ar: "جارٍ حفظ النتائج…" },
+    savedSuccess: { en: "Results saved!", ar: "تم حفظ النتائج!" },
+    goToDashboard: { en: "Go to Dashboard", ar: "الذهاب إلى لوحة التحكم" },
+  },
+  questionnaire: {
+    stageTitle: { en: "Alzheimer's Questionnaire (AQ©)", ar: "استبيان الزهايمر (AQ©)" },
+    stageDescription: {
+      en: "Answer each question with Yes or No. Score a 'Yes' only when there has been a decline compared to the previous level of functioning.",
+      ar: "أجب على كل سؤال بنعم أو لا. أجب بـ 'نعم' فقط عند وجود تراجع مقارنة بالمستوى السابق.",
+    },
+    yes: { en: "Yes", ar: "نعم" },
+    no: { en: "No", ar: "لا" },
+    submit: { en: "Submit Questionnaire", ar: "إرسال الاستبيان" },
+    resultTitle: { en: "Your AQ© Score", ar: "درجتك في استبيان AQ©" },
+    interpretation: {
+      normal: { en: "Within normal range (0–4).", ar: "ضمن المعدل الطبيعي (0–4)." },
+      mild_cognitive_impairment: { en: "Suggests mild cognitive impairment (5–14).", ar: "يشير إلى ضعف إدراكي خفيف (5–14)." },
+      dementia: { en: "Suggests dementia (15+).", ar: "يشير إلى الخرف (15+)." },
+    },
+    continue: { en: "Continue to Assessment", ar: "المتابعة إلى التقييم" },
+  },
+  auth: {
+    login: { en: "Log In", ar: "تسجيل الدخول" },
+    signup: { en: "Sign Up", ar: "إنشاء حساب" },
+    email: { en: "Email", ar: "البريد الإلكتروني" },
+    password: { en: "Password", ar: "كلمة المرور" },
+    noAccount: { en: "Don't have an account?", ar: "ليس لديك حساب؟" },
+    hasAccount: { en: "Already have an account?", ar: "لديك حساب بالفعل؟" },
+    logout: { en: "Log Out", ar: "تسجيل الخروج" },
+  },
+  dashboard: {
+    title: { en: "Dashboard", ar: "لوحة التحكم" },
+    startGame: { en: "Start New Assessment", ar: "بدء تقييم جديد" },
+    viewProfile: { en: "View Profile & Scores", ar: "عرض الملف الشخصي والنتائج" },
+    welcome: { en: "Welcome back!", ar: "مرحباً بعودتك!" },
+  },
+  profile: {
+    title: { en: "My Profile", ar: "ملفي الشخصي" },
+    gameHistory: { en: "Game History", ar: "سجل الألعاب" },
+    aqScore: { en: "AQ© Score", ar: "درجة AQ©" },
+    noSessions: { en: "No sessions yet. Start an assessment!", ar: "لا توجد جلسات بعد. ابدأ تقييماً!" },
+    date: { en: "Date", ar: "التاريخ" },
+    score: { en: "Score", ar: "الدرجة" },
+    back: { en: "Back", ar: "رجوع" },
+  },
+  theme: {
+    system: { en: "System", ar: "النظام" },
+    light: { en: "Light", ar: "فاتح" },
+    dark: { en: "Dark", ar: "داكن" },
   },
 } as const;
