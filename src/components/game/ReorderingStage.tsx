@@ -46,16 +46,17 @@ export default function ReorderingStage({ onComplete, onResult, language }: Prop
       </div>
 
       {/* Segment images display */}
-      <div className="mb-6 grid grid-cols-3 gap-3 sm:grid-cols-6">
+      <div className="mb-8 grid grid-cols-3 gap-4 sm:grid-cols-6">
         {shuffledSegments.map((seg) => (
-          <div key={seg.id} className="relative overflow-hidden rounded-lg border border-border bg-surface shadow-sm">
+          <div key={seg.id} className="group relative overflow-hidden rounded-xl border-2 border-border bg-card shadow-md transition-shadow hover:shadow-lg">
             <img
               src={seg.src}
               alt={`Segment ${seg.id}`}
-              className="aspect-[4/3] w-full object-cover"
+              className="aspect-[16/10] w-full object-cover object-center"
+              loading="eager"
             />
-            <div className="absolute bottom-0 left-0 right-0 bg-foreground/60 py-1 text-center text-lg font-bold text-background">
-              {seg.id}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-foreground/80 to-transparent py-1.5 text-center">
+              <span className="text-lg font-extrabold tracking-wide text-background drop-shadow-sm">{seg.id}</span>
             </div>
           </div>
         ))}
