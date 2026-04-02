@@ -1,3 +1,5 @@
+import { Language } from "@/lib/gameCopy";
+
 export interface ClipConfig {
   label: string;
   src: string;
@@ -20,13 +22,22 @@ export const DISTRACTOR_CLIPS: ClipConfig[] = [
 export const CLIP_ORDER = ["fasla", "sixEight", "money", "marshmallow"] as const;
 export const REPS_PER_CLIP = 3;
 
-/** Audio files per clip for the short-term memory intro */
-export const CLIP_AUDIO: Record<string, string> = {
-  fasla: "/audio/stage2-fasla.mp3",
-  sixEight: "/audio/stage2-6-8.mp3",
-  money: "/audio/stage2-money.mp3",
-  marshmallow: "/audio/stage2-marshmallow.mp3",
+/** Audio files per clip for the short-term memory intro — language-aware */
+export const CLIP_AUDIO: Record<string, Record<Language, string>> = {
+  fasla: { en: "/audio/stage2-fasla.mp3", ar: "/audio/stage2-fasla-ar.mp3" },
+  sixEight: { en: "/audio/stage2-6-8.mp3", ar: "/audio/stage2-6-8-ar.mp3" },
+  money: { en: "/audio/stage2-money.mp3", ar: "/audio/stage2-money-ar.mp3" },
+  marshmallow: { en: "/audio/stage2-marshmallow.mp3", ar: "/audio/stage2-marshmallow-ar.mp3" },
 };
+
+/** Get language-aware audio path for a stage */
+export function getAudioSrc(basePath: string, language: Language): string {
+  if (language === "ar") {
+    // Convert "/audio/stage1.mp3" → "/audio/stage1-ar.mp3"
+    return basePath.replace(/\.mp3$/, "-ar.mp3");
+  }
+  return basePath;
+}
 
 export const SIX_EIGHT_SEGMENTS = [
   { id: 1, src: "/segments/6-8-1.jpg" },
