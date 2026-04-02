@@ -1,10 +1,12 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { AQ_QUESTIONS, computeAQScore } from "@/config/aqQuestions";
 import { gameCopy, Language, t } from "@/lib/gameCopy";
 import { supabase } from "@/integrations/supabase/client";
+import { getAudioSrc } from "@/config/videoConfig";
 import StageIntro from "@/components/game/StageIntro";
+import { Volume2, Pause, RotateCcw } from "lucide-react";
 
 interface Props {
   language: Language;
@@ -17,8 +19,34 @@ export default function AQQuestionnaire({ language, userId, onComplete }: Props)
   const [submitted, setSubmitted] = useState(false);
   const [result, setResult] = useState<{ total: number; interpretation: string } | null>(null);
   const [saving, setSaving] = useState(false);
+  const [qPlaying, setQPlaying] = useState(false);
+  const [qPaused, setQPaused] = useState(false);
+  const qAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const allAnswered = AQ_QUESTIONS.every((q) => answers[q.id] !== undefined);
+
+  const questionsAudioSrc = language === "ar" ? "/audio/questionnaire-questions-ar.mp3" : "/audio/questionnaire-questions.mp3";
+
+  const getQAudio = useCallback(() => {
+    if (!qAudioRef.current || qAudioRef.current.src !== new URL(questionsAudioSrc, window.location.origin).href) {
+      if (qAudioRef.current) { qAudioRef.current.pause(); qAudioRef.current = null; }
+      qAudioRef.current = new Audio(questionsAudioSrc);
+      qAudioRef.current.onended = () => { setQPlaying(false); setQPaused(false); };
+    }
+    return qAudioRef.current;
+  }, [questionsAudioSrc]);
+
+  const toggleQAudio = useCallback(() => {
+    const audio = getQAudio();
+    if (qPlaying && !qPaused) { audio.pause(); setQPaused(true); }
+    else if (qPaused) { void audio.play(); setQPaused(false); }
+    else { audio.currentTime = 0; void audio.play(); setQPlaying(true); setQPaused(false); }
+  }, [qPlaying, qPaused, getQAudio]);
+
+  const restartQAudio = useCallback(() => {
+    const audio = getQAudio();
+    audio.currentTime = 0; void audio.play(); setQPlaying(true); setQPaused(false);
+  }, [getQAudio]);
 
   const handleAnswer = useCallback((id: number, val: boolean) => {
     setAnswers((prev) => ({ ...prev, [id]: val }));
@@ -65,7 +93,6 @@ export default function AQQuestionnaire({ language, userId, onComplete }: Props)
     );
   }
 
-  // Group questions by category
   const categories = [...new Set(AQ_QUESTIONS.map((q) => q.category))];
 
   return (
@@ -73,9 +100,22 @@ export default function AQQuestionnaire({ language, userId, onComplete }: Props)
       <StageIntro
         title={t(language, gameCopy.questionnaire.stageTitle)}
         description={t(language, gameCopy.questionnaire.stageDescription)}
-        audioSrc="/audio/questionnaire.mp3"
+        audioSrc={getAudioSrc("/audio/questionnaire.mp3", language)}
         language={language}
       />
+
+      {/* Listen to questions audio button */}
+      <div className="mb-6 flex items-center gap-1">
+        <Button variant="outline" size="sm" onClick={toggleQAudio} className="gap-2">
+          {qPlaying && !qPaused ? <Pause className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+          {t(language, gameCopy.questionnaire.listenQuestions)}
+        </Button>
+        {qPlaying && (
+          <Button variant="ghost" size="sm" onClick={restartQAudio} className="px-2" title="Restart">
+            <RotateCcw className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
 
       <div className="space-y-6">
         {categories.map((cat) => (
