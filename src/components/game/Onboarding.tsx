@@ -1,8 +1,9 @@
 import { useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Volume2, Pause } from "lucide-react";
+import { Volume2, Pause, RotateCcw } from "lucide-react";
 import { gameCopy, Language, t } from "@/lib/gameCopy";
+import { getAudioSrc } from "@/config/videoConfig";
 
 interface OnboardingProps {
   onStart: () => void;
@@ -11,22 +12,33 @@ interface OnboardingProps {
 
 export default function Onboarding({ onStart, language }: OnboardingProps) {
   const [playing, setPlaying] = useState(false);
+  const [paused, setPaused] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  const audioSrc = getAudioSrc("/audio/intro.mp3", language);
+
+  const getOrCreateAudio = useCallback(() => {
+    if (!audioRef.current || audioRef.current.src !== new URL(audioSrc, window.location.origin).href) {
+      if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
+      audioRef.current = new Audio(audioSrc);
+      audioRef.current.onended = () => { setPlaying(false); setPaused(false); };
+    }
+    return audioRef.current;
+  }, [audioSrc]);
+
   const toggleAudio = useCallback(() => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio("/audio/intro.mp3");
-      audioRef.current.onended = () => setPlaying(false);
-    }
-    if (playing) {
-      audioRef.current.pause();
-      setPlaying(false);
-    } else {
-      audioRef.current.currentTime = 0;
-      void audioRef.current.play();
-      setPlaying(true);
-    }
-  }, [playing]);
+    const audio = getOrCreateAudio();
+    if (!audio) return;
+    if (playing && !paused) { audio.pause(); setPaused(true); }
+    else if (paused) { void audio.play(); setPaused(false); }
+    else { audio.currentTime = 0; void audio.play(); setPlaying(true); setPaused(false); }
+  }, [playing, paused, getOrCreateAudio]);
+
+  const restartAudio = useCallback(() => {
+    const audio = getOrCreateAudio();
+    if (!audio) return;
+    audio.currentTime = 0; void audio.play(); setPlaying(true); setPaused(false);
+  }, [getOrCreateAudio]);
 
   return (
     <motion.div
@@ -57,16 +69,17 @@ export default function Onboarding({ onStart, language }: OnboardingProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.4 }}
-          className="mb-6"
+          className="mb-6 flex items-center justify-center gap-1"
         >
-          <Button
-            variant="outline"
-            onClick={toggleAudio}
-            className="gap-2"
-          >
-            {playing ? <Pause className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+          <Button variant="outline" onClick={toggleAudio} className="gap-2">
+            {playing && !paused ? <Pause className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
             {t(language, gameCopy.onboarding.playIntro)}
           </Button>
+          {playing && (
+            <Button variant="ghost" size="sm" onClick={restartAudio} className="px-2" title="Restart">
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+          )}
         </motion.div>
 
         <motion.div

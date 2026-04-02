@@ -5,6 +5,7 @@ import { SIX_EIGHT_SEGMENTS } from "@/config/videoConfig";
 import { REORDERING_OPTIONS, CORRECT_REORDERING } from "@/config/puzzleConfig";
 import { CheckCircle, XCircle } from "lucide-react";
 import { gameCopy, Language, t } from "@/lib/gameCopy";
+import { getAudioSrc } from "@/config/videoConfig";
 import StageIntro from "./StageIntro";
 
 interface Props {
@@ -36,17 +37,12 @@ export default function ReorderingStage({ onComplete, onResult, language }: Prop
       <StageIntro
         title={t(language, gameCopy.reordering.stageTitle)}
         description={t(language, gameCopy.reordering.stageDescription)}
-        audioSrc="/audio/stage3.mp3"
+        audioSrc={getAudioSrc("/audio/stage3.mp3", language)}
         language={language}
       />
 
-      <div className="mb-6 rounded-xl border border-border bg-surface p-6 shadow-sm">
-        <h2 className="mb-2 text-2xl font-bold text-foreground">{t(language, gameCopy.reordering.title)}</h2>
-        <p className="leading-relaxed text-muted-foreground">{t(language, gameCopy.reordering.description)}</p>
-      </div>
-
-      {/* Segment images display */}
-      <div className="mb-8 grid grid-cols-3 gap-4 sm:grid-cols-6">
+      {/* Segment images display — 3x2 grid, bigger images */}
+      <div className="mb-8 grid grid-cols-3 gap-4">
         {shuffledSegments.map((seg) => (
           <div key={seg.id} className="group relative overflow-hidden rounded-xl border-2 border-border bg-card shadow-md transition-shadow hover:shadow-lg">
             <img
@@ -55,8 +51,8 @@ export default function ReorderingStage({ onComplete, onResult, language }: Prop
               className="aspect-[16/10] w-full object-cover object-center"
               loading="eager"
             />
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-foreground/80 to-transparent py-1.5 text-center">
-              <span className="text-lg font-extrabold tracking-wide text-background drop-shadow-sm">{seg.id}</span>
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-foreground/80 to-transparent py-2 text-center">
+              <span className="text-xl font-extrabold tracking-wide text-background drop-shadow-sm">{seg.id}</span>
             </div>
           </div>
         ))}

@@ -2,6 +2,7 @@ import { useReducer, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { PUZZLE_ASSETS, GRID_MAP, START_POS, CHEST_POS, KEY_POS, SAFE_SAND_TILES, TileType } from "@/config/puzzleConfig";
+import { getAudioSrc } from "@/config/videoConfig";
 import { PuzzleRunLog } from "@/types/game";
 import { gameCopy, Language, t } from "@/lib/gameCopy";
 import StageIntro from "./StageIntro";
@@ -105,7 +106,7 @@ export default function PuzzleStage({ onComplete, onResult, language }: Props) {
       <StageIntro
         title={t(language, gameCopy.puzzle.stageTitle)}
         description={t(language, gameCopy.puzzle.stageDescription)}
-        audioSrc="/audio/stage4.mp3"
+        audioSrc={getAudioSrc("/audio/stage4.mp3", language)}
         language={language}
       />
       <div className="grid gap-8 lg:grid-cols-[1fr_auto]">

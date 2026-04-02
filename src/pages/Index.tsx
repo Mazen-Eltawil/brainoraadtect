@@ -74,7 +74,7 @@ const Index = () => {
     }
 
     if (currentView === "profile") {
-      return <ProfilePage language={language} userId={user!.id} email={user!.email || ""} onBack={() => setView("dashboard")} />;
+      return <ProfilePage language={language} userId={user!.id} email={user!.email || ""} displayName={profile?.display_name} onBack={() => setView("dashboard")} />;
     }
 
     if (currentView === "dashboard") {

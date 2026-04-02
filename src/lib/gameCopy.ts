@@ -29,8 +29,8 @@ export const stageLabels: Record<Language, Record<GameStage, string>> = {
 
 export const gameCopy = {
   appTitle: {
-    en: "Brainaura Detect",
-    ar: "Brainaura Detect",
+    en: "Brainora ADtect",
+    ar: "Brainora ADtect",
   },
   topBar: {
     id: { en: "ID", ar: "المعرف" },
@@ -39,10 +39,10 @@ export const gameCopy = {
     unmute: { en: "Unmute", ar: "تشغيل الصوت" },
   },
   onboarding: {
-    title: { en: "Welcome to Brainaura Detect", ar: "مرحبًا بك في Brainaura Detect" },
+    title: { en: "Welcome to Brainora ADtect", ar: "مرحبًا بك في Brainora ADtect" },
     description: {
-      en: "Brainaura Detect is an interactive cognitive assessment that evaluates your memory, sequencing, and problem-solving abilities through engaging dance movement videos, puzzles, and a clinically-validated questionnaire. The assessment takes about 15 minutes and is designed to be both fun and insightful.",
-      ar: "Brainaura Detect هو تقييم إدراكي تفاعلي يقيّم ذاكرتك وقدرتك على التسلسل وحل المشكلات من خلال مقاطع فيديو رقص تفاعلية وألغاز واستبيان معتمد إكلينيكياً. يستغرق التقييم حوالي 15 دقيقة.",
+      en: "Brainora ADtect is an interactive cognitive assessment that evaluates your memory, sequencing, and problem-solving abilities through engaging dance movement videos, puzzles, and a clinically-validated questionnaire. The assessment takes about 15 minutes and is designed to be both fun and insightful.",
+      ar: "Brainora ADtect هو تقييم إدراكي تفاعلي يقيّم ذاكرتك وقدرتك على التسلسل وحل المشكلات من خلال مقاطع فيديو رقص تفاعلية وألغاز واستبيان معتمد إكلينيكياً. يستغرق التقييم حوالي 15 دقيقة.",
     },
     playIntro: { en: "Play Intro Audio", ar: "تشغيل صوت المقدمة" },
     button: { en: "Start Assessment", ar: "ابدأ التقييم" },
@@ -50,6 +50,7 @@ export const gameCopy = {
   stageIntro: {
     playAudio: { en: "Play Instructions", ar: "تشغيل التعليمات" },
     playing: { en: "Playing…", ar: "جارٍ التشغيل…" },
+    paused: { en: "Paused", ar: "متوقف" },
   },
   learning: {
     stageTitle: { en: "Stage 1 – Learning Phase", ar: "المرحلة 1 – مرحلة التعلّم" },
@@ -178,6 +179,7 @@ export const gameCopy = {
       dementia: { en: "Suggests dementia (15+).", ar: "يشير إلى الخرف (15+)." },
     },
     continue: { en: "Continue to Assessment", ar: "المتابعة إلى التقييم" },
+    listenQuestions: { en: "Listen to Questions", ar: "استمع للأسئلة" },
   },
   auth: {
     login: { en: "Log In", ar: "تسجيل الدخول" },
@@ -198,7 +200,7 @@ export const gameCopy = {
   },
   profile: {
     title: { en: "My Profile", ar: "ملفي الشخصي" },
-    gameHistory: { en: "Game History", ar: "سجل الألعاب" },
+    gameHistory: { en: "Assessment Results", ar: "نتائج التقييم" },
     aqScore: { en: "AQ© Score", ar: "درجة AQ©" },
     noSessions: { en: "No sessions yet. Start an assessment!", ar: "لا توجد جلسات بعد. ابدأ تقييماً!" },
     date: { en: "Date", ar: "التاريخ" },
@@ -213,6 +215,12 @@ export const gameCopy = {
     selected: { en: "Selected", ar: "المختار" },
     correct: { en: "Correct", ar: "صحيح" },
     responseTime: { en: "Response Time", ar: "وقت الاستجابة" },
+    name: { en: "Name", ar: "الاسم" },
+    shortTerm: { en: "Short-term", ar: "ذاكرة قصيرة" },
+    longTerm: { en: "Long-term", ar: "ذاكرة طويلة" },
+    reordering: { en: "Reordering", ar: "ترتيب" },
+    puzzle: { en: "Puzzle", ar: "لغز" },
+    finalScore: { en: "Final Score", ar: "الدرجة النهائية" },
   },
   theme: {
     system: { en: "System", ar: "النظام" },

@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { GAME_CLIPS, CLIP_ORDER } from "@/config/videoConfig";
+import { GAME_CLIPS, CLIP_ORDER, getAudioSrc } from "@/config/videoConfig";
 import { CheckCircle, XCircle } from "lucide-react";
 import { ResponseLog } from "@/types/game";
 import { gameCopy, Language, t } from "@/lib/gameCopy";
@@ -71,7 +71,7 @@ export default function LongTermMemory({ onComplete, onLogResponse, language, is
       <StageIntro
         title={t(language, gameCopy.longTerm.stageTitle)}
         description={t(language, gameCopy.longTerm.stageDescription)}
-        audioSrc="/audio/stage5.mp3"
+        audioSrc={getAudioSrc("/audio/stage5.mp3", language)}
         language={language}
       />
       <div className="mb-6 rounded-xl border border-border bg-surface p-6 shadow-sm">

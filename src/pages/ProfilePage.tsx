@@ -9,6 +9,7 @@ interface Props {
   language: Language;
   userId: string;
   email: string;
+  displayName?: string | null;
   onBack: () => void;
 }
 
@@ -43,7 +44,7 @@ interface ResponseRow {
   response_time_ms: number;
 }
 
-export default function ProfilePage({ language, userId, email, onBack }: Props) {
+export default function ProfilePage({ language, userId, email, displayName, onBack }: Props) {
   const [sessions, setSessions] = useState<SessionRow[]>([]);
   const [aq, setAQ] = useState<AQRow | null>(null);
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
@@ -67,17 +68,10 @@ export default function ProfilePage({ language, userId, email, onBack }: Props) 
     setLoadingResponses(false);
   };
 
-  const interpLabel = (key: string) => {
-    const map: Record<string, Record<Language, string>> = {
-      normal: gameCopy.questionnaire.interpretation.normal,
-      mild_cognitive_impairment: gameCopy.questionnaire.interpretation.mild_cognitive_impairment,
-      dementia: gameCopy.questionnaire.interpretation.dementia,
-    };
-    return map[key] ? t(language, map[key]) : key;
-  };
+  const userName = displayName || email;
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-3xl px-4 py-8">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-5xl px-4 py-8">
       <Button onClick={onBack} variant="ghost" className="mb-4 gap-2">
         <ArrowLeft className="h-4 w-4" /> {t(language, gameCopy.profile.back)}
       </Button>
@@ -89,40 +83,34 @@ export default function ProfilePage({ language, userId, email, onBack }: Props) 
         <p className="text-lg font-semibold text-foreground">{email}</p>
       </div>
 
-      {aq && (
-        <div className="mb-6 rounded-xl border border-border bg-surface p-5 shadow-sm">
-          <h2 className="mb-2 text-lg font-bold text-foreground">{t(language, gameCopy.profile.aqScore)}</h2>
-          <p className="text-3xl font-bold text-primary">{aq.total_score}/27</p>
-          <p className="text-sm text-muted-foreground">{interpLabel(aq.interpretation)}</p>
-        </div>
-      )}
-
       <h2 className="mb-3 text-lg font-bold text-foreground">{t(language, gameCopy.profile.gameHistory)}</h2>
-      {sessions.length === 0 ? (
+      {sessions.length === 0 && !aq ? (
         <p className="text-muted-foreground">{t(language, gameCopy.profile.noSessions)}</p>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-border">
           <table className="w-full text-sm">
             <thead className="bg-muted/50">
               <tr>
-                <th className="p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.profile.date)}</th>
-                <th className="p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.profile.score)}</th>
-                <th className="p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.results.shortTerm)}</th>
-                <th className="p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.results.longTerm)}</th>
-                <th className="p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.results.reordering)}</th>
-                <th className="p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.results.puzzle)}</th>
+                <th className="p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.profile.name)}</th>
+                <th className="p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.profile.shortTerm)}</th>
+                <th className="p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.profile.longTerm)}</th>
+                <th className="p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.profile.reordering)}</th>
+                <th className="p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.profile.puzzle)}</th>
+                <th className="p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.profile.aqScore)}</th>
+                <th className="p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.profile.finalScore)}</th>
                 <th className="p-3 text-left font-semibold text-muted-foreground"></th>
               </tr>
             </thead>
             <tbody>
               {sessions.map((s) => (
                 <tr key={s.id} className="border-t border-border">
-                  <td className="p-3 text-foreground">{new Date(s.created_at).toLocaleDateString()}</td>
-                  <td className="p-3 font-bold text-primary">{s.total_score}/{s.max_score}</td>
+                  <td className="p-3 text-foreground">{userName}</td>
                   <td className="p-3 text-foreground">{s.short_term_score}/{s.short_term_total}</td>
                   <td className="p-3 text-foreground">{s.long_term_score}/{s.long_term_total}</td>
-                  <td className="p-3 text-foreground">{s.reordering_correct ? "✅" : "❌"}</td>
-                  <td className="p-3 text-foreground">{s.puzzle_success ? "✅" : "❌"}</td>
+                  <td className="p-3 text-foreground">{s.reordering_correct ? "1" : "0"}</td>
+                  <td className="p-3 text-foreground">{s.puzzle_success ? "1" : "0"}</td>
+                  <td className="p-3 text-foreground">{aq ? `${aq.total_score}/27` : "—"}</td>
+                  <td className="p-3 font-bold text-primary">{s.total_score}/{s.max_score}</td>
                   <td className="p-3">
                     <Button size="sm" variant="ghost" onClick={() => viewSession(s.id)} className="gap-1">
                       <Eye className="h-4 w-4" /> {t(language, gameCopy.profile.viewDetails)}
