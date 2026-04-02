@@ -106,7 +106,7 @@ export default function PuzzleStage({ onComplete, onResult, language }: Props) {
       <StageIntro
         title={t(language, gameCopy.puzzle.stageTitle)}
         description={t(language, gameCopy.puzzle.stageDescription)}
-        audioSrc="/audio/stage4.mp3"
+        audioSrc={getAudioSrc("/audio/stage4.mp3", language)}
         language={language}
       />
       <div className="grid gap-8 lg:grid-cols-[1fr_auto]">
