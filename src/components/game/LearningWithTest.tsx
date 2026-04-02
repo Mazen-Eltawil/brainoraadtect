@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle } from "lucide-react";
-import { GAME_CLIPS, CLIP_ORDER, REPS_PER_CLIP, DISTRACTOR_CLIPS, CLIP_AUDIO, ClipConfig } from "@/config/videoConfig";
+import { GAME_CLIPS, CLIP_ORDER, REPS_PER_CLIP, DISTRACTOR_CLIPS, CLIP_AUDIO, ClipConfig, getAudioSrc } from "@/config/videoConfig";
 import { ResponseLog } from "@/types/game";
 import { gameCopy, Language, t } from "@/lib/gameCopy";
 import StageIntro from "./StageIntro";
@@ -38,7 +38,6 @@ export default function LearningWithTest({ onComplete, onLogLearning, onLogRespo
   const currentKey = CLIP_ORDER[clipIndex];
   const currentClip = GAME_CLIPS[currentKey];
 
-  // Build test options for current clip: correct + 3 random distractors
   const testOptions = useMemo(() => {
     const correct = GAME_CLIPS[currentKey];
     const otherMain = Object.entries(GAME_CLIPS)
@@ -71,7 +70,6 @@ export default function LearningWithTest({ onComplete, onLogLearning, onLogRespo
     if (nextRep < REPS_PER_CLIP) {
       setRep(nextRep);
     } else {
-      // Done learning this clip → go to test
       setPhase("testing");
       startTimeRef.current = Date.now();
     }
@@ -118,7 +116,7 @@ export default function LearningWithTest({ onComplete, onLogLearning, onLogRespo
   }
 
   if (phase === "testing") {
-    const audioSrc = CLIP_AUDIO[currentKey];
+    const audioSrc = CLIP_AUDIO[currentKey][language];
     return (
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-4xl px-4 py-8">
         <StageIntro
@@ -180,7 +178,7 @@ export default function LearningWithTest({ onComplete, onLogLearning, onLogRespo
         <StageIntro
           title={t(language, gameCopy.learning.stageTitle)}
           description={t(language, gameCopy.learning.stageDescription)}
-          audioSrc="/audio/stage1.mp3"
+          audioSrc={getAudioSrc("/audio/stage1.mp3", language)}
           language={language}
         />
         <div className="rounded-xl border border-border bg-surface p-6 shadow-sm">

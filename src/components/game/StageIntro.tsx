@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Volume2, Pause } from "lucide-react";
+import { Volume2, Pause, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { gameCopy, Language, t } from "@/lib/gameCopy";
 
@@ -13,23 +13,59 @@ interface StageIntroProps {
 
 export default function StageIntro({ title, description, audioSrc, language }: StageIntroProps) {
   const [playing, setPlaying] = useState(false);
+  const [paused, setPaused] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const toggleAudio = useCallback(() => {
-    if (!audioSrc) return;
-    if (!audioRef.current) {
+  const getOrCreateAudio = useCallback(() => {
+    if (!audioSrc) return null;
+    if (!audioRef.current || audioRef.current.src !== new URL(audioSrc, window.location.origin).href) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
       audioRef.current = new Audio(audioSrc);
-      audioRef.current.onended = () => setPlaying(false);
+      audioRef.current.onended = () => {
+        setPlaying(false);
+        setPaused(false);
+      };
     }
-    if (playing) {
-      audioRef.current.pause();
-      setPlaying(false);
+    return audioRef.current;
+  }, [audioSrc]);
+
+  const toggleAudio = useCallback(() => {
+    const audio = getOrCreateAudio();
+    if (!audio) return;
+    if (playing && !paused) {
+      // Currently playing → pause
+      audio.pause();
+      setPaused(true);
+    } else if (paused) {
+      // Paused → resume
+      void audio.play();
+      setPaused(false);
     } else {
-      audioRef.current.currentTime = 0;
-      void audioRef.current.play();
+      // Not playing → start
+      audio.currentTime = 0;
+      void audio.play();
       setPlaying(true);
+      setPaused(false);
     }
-  }, [audioSrc, playing]);
+  }, [playing, paused, getOrCreateAudio]);
+
+  const restartAudio = useCallback(() => {
+    const audio = getOrCreateAudio();
+    if (!audio) return;
+    audio.currentTime = 0;
+    void audio.play();
+    setPlaying(true);
+    setPaused(false);
+  }, [getOrCreateAudio]);
+
+  const buttonLabel = playing
+    ? paused
+      ? t(language, gameCopy.stageIntro.paused)
+      : t(language, gameCopy.stageIntro.playing)
+    : t(language, gameCopy.stageIntro.playAudio);
 
   return (
     <motion.div
@@ -43,15 +79,28 @@ export default function StageIntro({ title, description, audioSrc, language }: S
           <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{description}</p>
         </div>
         {audioSrc && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={toggleAudio}
-            className="shrink-0 gap-2"
-          >
-            {playing ? <Pause className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-            {playing ? t(language, gameCopy.stageIntro.playing) : t(language, gameCopy.stageIntro.playAudio)}
-          </Button>
+          <div className="flex shrink-0 items-center gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={toggleAudio}
+              className="gap-2"
+            >
+              {playing && !paused ? <Pause className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+              {buttonLabel}
+            </Button>
+            {playing && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={restartAudio}
+                className="px-2"
+                title="Restart"
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         )}
       </div>
     </motion.div>
