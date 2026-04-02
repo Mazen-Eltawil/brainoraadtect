@@ -2,6 +2,7 @@ import { useReducer, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { PUZZLE_ASSETS, GRID_MAP, START_POS, CHEST_POS, KEY_POS, SAFE_SAND_TILES, TileType } from "@/config/puzzleConfig";
+import { getAudioSrc } from "@/config/videoConfig";
 import { PuzzleRunLog } from "@/types/game";
 import { gameCopy, Language, t } from "@/lib/gameCopy";
 import StageIntro from "./StageIntro";
