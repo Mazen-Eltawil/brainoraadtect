@@ -111,7 +111,7 @@ export default function PuzzleStage({ onComplete, onResult, language }: Props) {
       />
       <div className="grid gap-8 lg:grid-cols-[1fr_auto]">
         <div className="relative flex flex-col items-center">
-          <div className="grid grid-cols-3 grid-rows-3 gap-1 rounded-xl p-4" style={{ width: 450, height: 450, background: "linear-gradient(135deg, hsl(40, 30%, 90%), hsl(40, 20%, 85%))" }}>
+          <div className="grid grid-cols-3 grid-rows-3 gap-1 rounded-xl p-4" style={{ width: 450, height: 450, background: "linear-gradient(135deg, hsl(40, 30%, 90%), hsl(40, 20%, 85%))", direction: "ltr" }}>
             {GRID_MAP.flatMap((row, r) =>
               row.map((tileType, c) => {
                 const isVisited = state.path.some((p) => posEq(p, [r, c]));
