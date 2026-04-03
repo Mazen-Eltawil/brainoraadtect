@@ -16,17 +16,17 @@ interface Props {
 interface SessionRow {
   id: string;
   created_at: string;
-  total_score: number;
-  max_score: number;
-  short_term_score: number;
-  short_term_total: number;
-  long_term_score: number;
-  long_term_total: number;
-  reordering_correct: boolean;
-  reordering_answer: string | null;
-  puzzle_success: boolean;
+  total_score: number | null;
+  max_score: number | null;
+  short_term_score: number | null;
+  short_term_total: number | null;
+  long_term_score: number | null;
+  long_term_total: number | null;
+  reordering_correct: boolean | null;
+  puzzle_success: boolean | null;
   puzzle_steps: number | null;
   puzzle_duration_ms: number | null;
+  reordering_answer: string | null;
 }
 
 interface AQRow {
@@ -71,46 +71,41 @@ export default function ProfilePage({ language, userId, email, displayName, onBa
   const userName = displayName || email;
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-5xl px-4 py-8">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-6xl px-4 py-8">
       <Button onClick={onBack} variant="ghost" className="mb-4 gap-2">
         <ArrowLeft className="h-4 w-4" /> {t(language, gameCopy.profile.back)}
       </Button>
 
       <h1 className="mb-6 text-3xl font-bold text-foreground">{t(language, gameCopy.profile.title)}</h1>
 
-      <div className="mb-6 rounded-xl border border-border bg-surface p-5 shadow-sm">
-        <p className="text-sm text-muted-foreground">{t(language, gameCopy.auth.email)}</p>
-        <p className="text-lg font-semibold text-foreground">{email}</p>
-      </div>
-
       <h2 className="mb-3 text-lg font-bold text-foreground">{t(language, gameCopy.profile.gameHistory)}</h2>
-      {sessions.length === 0 && !aq ? (
+      {sessions.length === 0 ? (
         <p className="text-muted-foreground">{t(language, gameCopy.profile.noSessions)}</p>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-border">
           <table className="w-full text-sm">
             <thead className="bg-muted/50">
               <tr>
-                <th className="p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.profile.name)}</th>
-                <th className="p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.profile.shortTerm)}</th>
-                <th className="p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.profile.longTerm)}</th>
-                <th className="p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.profile.reordering)}</th>
-                <th className="p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.profile.puzzle)}</th>
-                <th className="p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.profile.aqScore)}</th>
-                <th className="p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.profile.finalScore)}</th>
-                <th className="p-3 text-left font-semibold text-muted-foreground"></th>
+                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">Email</th>
+                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">Short-term Score</th>
+                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">Long-term Score</th>
+                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">Reordering</th>
+                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">Puzzle</th>
+                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">Total Score</th>
+                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">AQ© Score</th>
+                <th className="p-3"></th>
               </tr>
             </thead>
             <tbody>
               {sessions.map((s) => (
-                <tr key={s.id} className="border-t border-border">
-                  <td className="p-3 text-foreground">{userName}</td>
-                  <td className="p-3 text-foreground">{s.short_term_score}/{s.short_term_total}</td>
-                  <td className="p-3 text-foreground">{s.long_term_score}/{s.long_term_total}</td>
-                  <td className="p-3 text-foreground">{s.reordering_correct ? "1" : "0"}</td>
-                  <td className="p-3 text-foreground">{s.puzzle_success ? "1" : "0"}</td>
-                  <td className="p-3 text-foreground">{aq ? `${aq.total_score}/27` : "—"}</td>
-                  <td className="p-3 font-bold text-primary">{s.total_score}/{s.max_score}</td>
+                <tr key={s.id} className="border-t border-border hover:bg-muted/30 transition-colors">
+                  <td className="p-3 text-foreground">{email}</td>
+                  <td className="p-3 text-foreground">{s.short_term_score ?? 0}</td>
+                  <td className="p-3 text-foreground">{s.long_term_score ?? 0}</td>
+                  <td className="p-3 text-foreground">{s.reordering_correct ? 1 : 0}</td>
+                  <td className="p-3 text-foreground">{s.puzzle_success ? 1 : 0}</td>
+                  <td className="p-3 font-bold text-primary">{s.total_score ?? 0}</td>
+                  <td className="p-3 text-foreground">{aq ? aq.total_score : "—"}</td>
                   <td className="p-3">
                     <Button size="sm" variant="ghost" onClick={() => viewSession(s.id)} className="gap-1">
                       <Eye className="h-4 w-4" /> {t(language, gameCopy.profile.viewDetails)}

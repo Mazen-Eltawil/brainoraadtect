@@ -48,6 +48,16 @@ export default function AQQuestionnaire({ language, userId, onComplete }: Props)
     audio.currentTime = 0; void audio.play(); setQPlaying(true); setQPaused(false);
   }, [getQAudio]);
 
+  // Stop audio on unmount
+  useEffect(() => {
+    return () => {
+      if (qAudioRef.current) {
+        qAudioRef.current.pause();
+        qAudioRef.current = null;
+      }
+    };
+  }, []);
+
   const handleAnswer = useCallback((id: number, val: boolean) => {
     setAnswers((prev) => ({ ...prev, [id]: val }));
   }, []);
