@@ -61,6 +61,16 @@ export default function StageIntro({ title, description, audioSrc, language }: S
     setPaused(false);
   }, [getOrCreateAudio]);
 
+  // Stop audio on unmount (stage transition)
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
   const buttonLabel = playing
     ? paused
       ? t(language, gameCopy.stageIntro.paused)

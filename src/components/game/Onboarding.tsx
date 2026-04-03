@@ -40,6 +40,16 @@ export default function Onboarding({ onStart, language }: OnboardingProps) {
     audio.currentTime = 0; void audio.play(); setPlaying(true); setPaused(false);
   }, [getOrCreateAudio]);
 
+  // Stop audio on unmount (stage transition)
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
