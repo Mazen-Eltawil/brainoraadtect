@@ -175,6 +175,42 @@ export type Database = {
         }
         Relationships: []
       }
+      scores: {
+        Row: {
+          aq_assessment: number | null
+          created_at: string
+          email: string
+          id: string
+          long_term_score: number | null
+          puzzle_success: boolean | null
+          reordering_correct: boolean | null
+          short_term_score: number | null
+          total_score: number | null
+        }
+        Insert: {
+          aq_assessment?: number | null
+          created_at?: string
+          email: string
+          id?: string
+          long_term_score?: number | null
+          puzzle_success?: boolean | null
+          reordering_correct?: boolean | null
+          short_term_score?: number | null
+          total_score?: number | null
+        }
+        Update: {
+          aq_assessment?: number | null
+          created_at?: string
+          email?: string
+          id?: string
+          long_term_score?: number | null
+          puzzle_success?: boolean | null
+          reordering_correct?: boolean | null
+          short_term_score?: number | null
+          total_score?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
