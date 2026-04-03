@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Volume2, Pause, RotateCcw } from "lucide-react";
@@ -39,6 +39,16 @@ export default function Onboarding({ onStart, language }: OnboardingProps) {
     if (!audio) return;
     audio.currentTime = 0; void audio.play(); setPlaying(true); setPaused(false);
   }, [getOrCreateAudio]);
+
+  // Stop audio on unmount (stage transition)
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <motion.div

@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Volume2, Pause, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -60,6 +60,16 @@ export default function StageIntro({ title, description, audioSrc, language }: S
     setPlaying(true);
     setPaused(false);
   }, [getOrCreateAudio]);
+
+  // Stop audio on unmount (stage transition)
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   const buttonLabel = playing
     ? paused

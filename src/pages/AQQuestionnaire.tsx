@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { AQ_QUESTIONS, computeAQScore } from "@/config/aqQuestions";
@@ -47,6 +47,16 @@ export default function AQQuestionnaire({ language, userId, onComplete }: Props)
     const audio = getQAudio();
     audio.currentTime = 0; void audio.play(); setQPlaying(true); setQPaused(false);
   }, [getQAudio]);
+
+  // Stop audio on unmount
+  useEffect(() => {
+    return () => {
+      if (qAudioRef.current) {
+        qAudioRef.current.pause();
+        qAudioRef.current = null;
+      }
+    };
+  }, []);
 
   const handleAnswer = useCallback((id: number, val: boolean) => {
     setAnswers((prev) => ({ ...prev, [id]: val }));
