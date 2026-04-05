@@ -19,7 +19,7 @@ interface ScoreRow {
   short_term_score: number;
   long_term_score: number;
   reordering_correct: boolean;
-  puzzle_success: boolean;
+  puzzle_score: number;
   total_score: number;
   aq_assessment: number;
   created_at: string;
