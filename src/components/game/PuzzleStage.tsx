@@ -29,7 +29,7 @@ function posEq(a: [number, number], b: [number, number]) { return a[0] === b[0] 
 function isAdjacent(a: [number, number], b: [number, number]) {
   const dr = Math.abs(b[0] - a[0]);
   const dc = Math.abs(b[1] - a[1]);
-  return (dr === 1 && dc === 0) || (dr === 0 && dc === 1);
+  return dr <= 1 && dc <= 1 && (dr + dc > 0);
 }
 
 function createReducer(config: PuzzleConfig) {
@@ -77,6 +77,13 @@ function PuzzleGrid({ config, stageNum, onFinish, language }: {
 }) {
   const reducerFn = useCallback(createReducer(config), [config]);
   const [state, dispatch] = useReducer(reducerFn, { currentPos: null, path: [], hasKey: false, status: "idle" });
+
+  // Auto-reset when config changes (new stage)
+  const configRef = useRef(config);
+  if (configRef.current !== config) {
+    configRef.current = config;
+    dispatch({ type: "RESET" });
+  }
   const startTimeRef = useRef(Date.now());
 
   const handleTileClick = useCallback((row: number, col: number) => {
@@ -206,7 +213,7 @@ export default function PuzzleStage({ onComplete, onResult, language }: Props) {
     const newRuns = [...runs, run];
     setRuns(newRuns);
     if (currentStage < 2) {
-      setCurrentStage(currentStage + 1);
+      setCurrentStage(prev => prev + 1);
     } else {
       onResult(newRuns);
       onComplete();
