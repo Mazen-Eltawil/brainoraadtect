@@ -206,7 +206,7 @@ export default function PuzzleStage({ onComplete, onResult, language }: Props) {
     const newRuns = [...runs, run];
     setRuns(newRuns);
     if (currentStage < 2) {
-      setCurrentStage(currentStage + 1);
+      setCurrentStage(prev => prev + 1);
     } else {
       onResult(newRuns);
       onComplete();
