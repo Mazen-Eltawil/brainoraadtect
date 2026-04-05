@@ -23,7 +23,7 @@ const Index = () => {
   const { theme, setTheme } = useTheme((profile?.theme_preference as Theme) || "system");
   const {
     stage, session, stageIndex, totalStages,
-    startGame, nextStage, addResponse, setPuzzleRun,
+    startGame, nextStage, addResponse, setPuzzleRun, setPuzzleRuns,
     setReorderingResult, addLearningLog, resetGame,
   } = useGameState();
 
