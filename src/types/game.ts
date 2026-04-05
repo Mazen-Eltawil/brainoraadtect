@@ -41,13 +41,15 @@ export interface PuzzleRunLog {
   success: boolean;
   reason: string;
   durationMs: number;
+  score: number; // 0.0 to 1.0 per stage
 }
 
 export interface GameSession {
   playerId: string;
   startTime: string;
   responses: ResponseLog[];
-  puzzleRun: PuzzleRunLog | null;
+  puzzleRuns: PuzzleRunLog[]; // Now an array of 3
+  puzzleRun: PuzzleRunLog | null; // Legacy compat
   reorderingAnswer: string | null;
   reorderingCorrect: boolean;
   learningLog: { clip: string; rep: number; completed: boolean; timestamp: string }[];
