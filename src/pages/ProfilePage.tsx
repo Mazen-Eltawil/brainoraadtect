@@ -74,7 +74,7 @@ export default function ProfilePage({ language, userId, email, displayName, onBa
                   <td className="p-3 text-foreground">{s.short_term_score}</td>
                   <td className="p-3 text-foreground">{s.long_term_score}</td>
                   <td className="p-3 text-foreground">{s.reordering_correct ? 1 : 0}</td>
-                  <td className="p-3 text-foreground">{s.puzzle_success ? 1 : 0}</td>
+                  <td className="p-3 text-foreground">{(s.puzzle_score ?? 0).toFixed(1)}/3</td>
                   <td className="p-3 font-bold text-primary">{s.total_score}</td>
                   <td className="p-3 text-foreground">{s.aq_assessment}</td>
                 </tr>
