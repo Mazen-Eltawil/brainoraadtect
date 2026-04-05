@@ -13,21 +13,60 @@ export interface Tile {
   col: number;
 }
 
-export const GRID_MAP: TileType[][] = [
-  ["empty", "crab", "chest"],
-  ["empty", "empty", "empty"],
-  ["start", "crab", "key"],
+// 3 puzzle configurations with increasing difficulty
+export interface PuzzleConfig {
+  grid: TileType[][];
+  startPos: [number, number];
+  chestPos: [number, number];
+  keyPos: [number, number];
+  safeSandTiles: [number, number][];
+}
+
+// Stage 1: crabs at (0,1) and (2,1) — original-ish
+export const PUZZLE_STAGES: PuzzleConfig[] = [
+  {
+    grid: [
+      ["empty", "crab", "chest"],
+      ["empty", "empty", "empty"],
+      ["start", "crab", "key"],
+    ],
+    startPos: [2, 0],
+    chestPos: [0, 2],
+    keyPos: [2, 2],
+    safeSandTiles: [[0, 0], [1, 0], [1, 1], [1, 2]],
+  },
+  // Stage 2: crabs at (0,0) and (1,1) — blocks the middle
+  {
+    grid: [
+      ["crab", "empty", "chest"],
+      ["empty", "crab", "empty"],
+      ["start", "empty", "key"],
+    ],
+    startPos: [2, 0],
+    chestPos: [0, 2],
+    keyPos: [2, 2],
+    safeSandTiles: [[0, 1], [1, 0], [1, 2], [2, 1]],
+  },
+  // Stage 3: crabs at (1,0), (0,1), and (2,1) — hardest, 3 crabs
+  {
+    grid: [
+      ["empty", "crab", "chest"],
+      ["crab", "empty", "empty"],
+      ["start", "crab", "key"],
+    ],
+    startPos: [2, 0],
+    chestPos: [0, 2],
+    keyPos: [2, 2],
+    safeSandTiles: [[0, 0], [1, 1], [1, 2]],
+  },
 ];
 
-export const START_POS: [number, number] = [2, 0];
-export const CHEST_POS: [number, number] = [0, 2];
-export const KEY_POS: [number, number] = [2, 2];
-
-export const SAFE_SAND_TILES: [number, number][] = [
-  [1, 0],
-  [1, 1],
-  [1, 2],
-];
+// Legacy exports for backward compat
+export const GRID_MAP = PUZZLE_STAGES[0].grid;
+export const START_POS = PUZZLE_STAGES[0].startPos;
+export const CHEST_POS = PUZZLE_STAGES[0].chestPos;
+export const KEY_POS = PUZZLE_STAGES[0].keyPos;
+export const SAFE_SAND_TILES = PUZZLE_STAGES[0].safeSandTiles;
 
 export const REORDERING_OPTIONS = [
   { label: "a", sequence: [1, 6, 3, 5, 4, 2] },

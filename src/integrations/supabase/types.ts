@@ -182,7 +182,7 @@ export type Database = {
           email: string
           id: string
           long_term_score: number | null
-          puzzle_success: boolean | null
+          puzzle_score: number | null
           reordering_correct: boolean | null
           short_term_score: number | null
           total_score: number | null
@@ -193,7 +193,7 @@ export type Database = {
           email: string
           id?: string
           long_term_score?: number | null
-          puzzle_success?: boolean | null
+          puzzle_score?: number | null
           reordering_correct?: boolean | null
           short_term_score?: number | null
           total_score?: number | null
@@ -204,7 +204,7 @@ export type Database = {
           email?: string
           id?: string
           long_term_score?: number | null
-          puzzle_success?: boolean | null
+          puzzle_score?: number | null
           reordering_correct?: boolean | null
           short_term_score?: number | null
           total_score?: number | null

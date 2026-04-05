@@ -5,6 +5,7 @@ const createSession = (): GameSession => ({
   playerId: "",
   startTime: new Date().toISOString(),
   responses: [],
+  puzzleRuns: [],
   puzzleRun: null,
   reorderingAnswer: null,
   reorderingCorrect: false,
@@ -17,23 +18,17 @@ export function useGameState() {
 
   const startGame = useCallback(() => {
     setSession(createSession());
-    // Skip learning and short_term — now handled together by LearningWithTest
-    // The flow after onboarding goes straight to "learning" which internally
-    // handles both learning + short-term per clip
     setStage("learning");
   }, []);
 
   const nextStage = useCallback(() => {
     const idx = STAGE_ORDER.indexOf(stage);
     if (stage === "learning") {
-      // After LearningWithTest completes (learn+test for all clips),
-      // skip short_term and go directly to reordering
       setStage("reordering");
       return;
     }
     if (idx < STAGE_ORDER.length - 1) {
       let next = STAGE_ORDER[idx + 1];
-      // Skip short_term since it's merged into learning
       if (next === "short_term") {
         next = STAGE_ORDER[idx + 2];
       }
@@ -45,8 +40,13 @@ export function useGameState() {
     setSession(prev => prev ? { ...prev, responses: [...prev.responses, response] } : prev);
   }, []);
 
+  const setPuzzleRuns = useCallback((runs: PuzzleRunLog[]) => {
+    setSession(prev => prev ? { ...prev, puzzleRuns: runs, puzzleRun: runs[runs.length - 1] || null } : prev);
+  }, []);
+
+  // Legacy compat
   const setPuzzleRun = useCallback((run: PuzzleRunLog) => {
-    setSession(prev => prev ? { ...prev, puzzleRun: run } : prev);
+    setSession(prev => prev ? { ...prev, puzzleRun: run, puzzleRuns: [run] } : prev);
   }, []);
 
   const setReorderingResult = useCallback((answer: string, correct: boolean) => {
@@ -70,7 +70,7 @@ export function useGameState() {
 
   return {
     stage, session, stageIndex, totalStages,
-    startGame, nextStage, addResponse, setPuzzleRun,
+    startGame, nextStage, addResponse, setPuzzleRun, setPuzzleRuns,
     setReorderingResult, addLearningLog, resetGame,
   };
 }

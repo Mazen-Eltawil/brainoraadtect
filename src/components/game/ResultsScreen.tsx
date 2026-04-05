@@ -22,10 +22,11 @@ export default function ResultsScreen({ session, language, onGoToDashboard }: Pr
   const longTermResponses = session.responses.filter((r) => r.stage === "long_term");
   const stCorrect = shortTermResponses.filter((r) => r.isCorrect).length;
   const ltCorrect = longTermResponses.filter((r) => r.isCorrect).length;
-  const puzzleSuccess = session.puzzleRun?.success ?? false;
+  const puzzleScore = session.puzzleRuns.reduce((s, r) => s + r.score, 0);
+  const puzzleScoreRounded = Math.round(puzzleScore * 10) / 10;
   const reorderCorrect = session.reorderingCorrect;
-  const totalScore = stCorrect + ltCorrect + (reorderCorrect ? 1 : 0) + (puzzleSuccess ? 1 : 0);
-  const maxScore = shortTermResponses.length + longTermResponses.length + 2;
+  const totalScore = stCorrect + ltCorrect + (reorderCorrect ? 1 : 0) + puzzleScoreRounded;
+  const maxScore = shortTermResponses.length + longTermResponses.length + 1 + 3; // reorder(1) + puzzle(3)
 
   useEffect(() => {
     const saveResults = async () => {
@@ -44,15 +45,15 @@ export default function ResultsScreen({ session, language, onGoToDashboard }: Pr
           long_term_total: longTermResponses.length,
           reordering_correct: reorderCorrect,
           reordering_answer: session.reorderingAnswer,
-          puzzle_success: puzzleSuccess,
-          puzzle_steps: session.puzzleRun?.path.length ?? 0,
-          puzzle_duration_ms: session.puzzleRun?.durationMs ?? 0,
-          puzzle_path: session.puzzleRun?.path ?? [],
+          puzzle_success: session.puzzleRuns.every(r => r.success),
+          puzzle_steps: session.puzzleRuns.reduce((s, r) => s + r.path.length, 0),
+          puzzle_duration_ms: session.puzzleRuns.reduce((s, r) => s + r.durationMs, 0),
+          puzzle_path: session.puzzleRuns.map(r => r.path),
           total_score: totalScore,
           max_score: maxScore,
         } as any).select().single();
 
-        // Also insert into the flat scores table
+        // Insert into scores table
         const { data: aqData } = await supabase.from("aq_assessments").select("total_score").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1);
         const aqScore = aqData && aqData.length > 0 ? (aqData[0] as any).total_score : 0;
         await supabase.from("scores").insert({
@@ -60,7 +61,7 @@ export default function ResultsScreen({ session, language, onGoToDashboard }: Pr
           short_term_score: stCorrect,
           long_term_score: ltCorrect,
           reordering_correct: reorderCorrect,
-          puzzle_success: puzzleSuccess,
+          puzzle_score: puzzleScoreRounded,
           total_score: totalScore,
           aq_assessment: aqScore,
         } as any);
@@ -80,7 +81,6 @@ export default function ResultsScreen({ session, language, onGoToDashboard }: Pr
           }
         }
         setSaved(true);
-        // Show rating popup after saving
         setTimeout(() => setShowRating(true), 800);
       } catch (e) {
         console.error("Error saving results:", e);
@@ -93,7 +93,6 @@ export default function ResultsScreen({ session, language, onGoToDashboard }: Pr
 
   const handleRating = (value: number) => {
     setRatingGiven(true);
-    // Dismiss after a brief moment
     setTimeout(() => setShowRating(false), 1200);
   };
 
@@ -116,9 +115,9 @@ export default function ResultsScreen({ session, language, onGoToDashboard }: Pr
             </div>
             <div className="rounded-lg border border-border p-4">
               <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">{t(language, gameCopy.results.puzzle)}</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{puzzleSuccess ? t(language, gameCopy.results.solved) : t(language, gameCopy.results.failed)}</p>
+              <p className="mt-1 text-2xl font-bold text-foreground">{puzzleScoreRounded}/3</p>
               <p className="text-sm text-muted-foreground">
-                {session.puzzleRun ? `${session.puzzleRun.path.length} steps · ${(session.puzzleRun.durationMs / 1000).toFixed(1)}${t(language, gameCopy.results.secondsShort)}` : "—"}
+                {session.puzzleRuns.map((r, i) => `S${i + 1}: ${r.score.toFixed(1)}`).join(" · ")}
               </p>
             </div>
           </div>
@@ -134,24 +133,10 @@ export default function ResultsScreen({ session, language, onGoToDashboard }: Pr
         </div>
       </motion.div>
 
-      {/* Rating popup overlay */}
       <AnimatePresence>
         {showRating && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-            onClick={() => setShowRating(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.85, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.85, opacity: 0, y: 20 }}
-              transition={{ type: "spring", duration: 0.5 }}
-              className="w-full max-w-sm rounded-2xl border border-border bg-background p-8 shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowRating(false)}>
+            <motion.div initial={{ scale: 0.85, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.85, opacity: 0, y: 20 }} transition={{ type: "spring", duration: 0.5 }} className="w-full max-w-sm rounded-2xl border border-border bg-background p-8 shadow-2xl" onClick={(e) => e.stopPropagation()}>
               <h3 className="mb-1 text-center text-xl font-bold text-foreground">
                 {language === "ar" ? "كيف كانت تجربتك؟" : "How was your experience?"}
               </h3>
@@ -160,18 +145,11 @@ export default function ResultsScreen({ session, language, onGoToDashboard }: Pr
               </p>
               <RatingInteraction onChange={handleRating} />
               {ratingGiven && (
-                <motion.p
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-4 text-center text-sm font-medium text-primary"
-                >
+                <motion.p initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="mt-4 text-center text-sm font-medium text-primary">
                   {language === "ar" ? "شكراً لتقييمك! 🎉" : "Thanks for your feedback! 🎉"}
                 </motion.p>
               )}
-              <button
-                onClick={() => setShowRating(false)}
-                className="mt-4 block w-full text-center text-xs text-muted-foreground hover:text-foreground transition-colors"
-              >
+              <button onClick={() => setShowRating(false)} className="mt-4 block w-full text-center text-xs text-muted-foreground hover:text-foreground transition-colors">
                 {language === "ar" ? "تخطي" : "Skip"}
               </button>
             </motion.div>

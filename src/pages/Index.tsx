@@ -23,7 +23,7 @@ const Index = () => {
   const { theme, setTheme } = useTheme((profile?.theme_preference as Theme) || "system");
   const {
     stage, session, stageIndex, totalStages,
-    startGame, nextStage, addResponse, setPuzzleRun,
+    startGame, nextStage, addResponse, setPuzzleRun, setPuzzleRuns,
     setReorderingResult, addLearningLog, resetGame,
   } = useGameState();
 
@@ -95,7 +95,7 @@ const Index = () => {
           <ReorderingStage onComplete={nextStage} onResult={setReorderingResult} language={language} />
         )}
         {stage === "puzzle" && (
-          <PuzzleStage onComplete={nextStage} onResult={setPuzzleRun} language={language} />
+          <PuzzleStage onComplete={nextStage} onResult={setPuzzleRuns} language={language} />
         )}
         {stage === "long_term" && (
           <LongTermMemory onComplete={nextStage} onLogResponse={addResponse} language={language} isMuted={isMuted} />
