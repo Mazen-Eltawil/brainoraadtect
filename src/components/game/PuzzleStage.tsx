@@ -29,7 +29,7 @@ function posEq(a: [number, number], b: [number, number]) { return a[0] === b[0] 
 function isAdjacent(a: [number, number], b: [number, number]) {
   const dr = Math.abs(b[0] - a[0]);
   const dc = Math.abs(b[1] - a[1]);
-  return (dr === 1 && dc === 0) || (dr === 0 && dc === 1);
+  return dr <= 1 && dc <= 1 && (dr + dc > 0);
 }
 
 function createReducer(config: PuzzleConfig) {
