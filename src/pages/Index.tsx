@@ -95,7 +95,7 @@ const Index = () => {
           <ReorderingStage onComplete={nextStage} onResult={setReorderingResult} language={language} />
         )}
         {stage === "puzzle" && (
-          <PuzzleStage onComplete={nextStage} onResult={setPuzzleRun} language={language} />
+          <PuzzleStage onComplete={nextStage} onResult={setPuzzleRuns} language={language} />
         )}
         {stage === "long_term" && (
           <LongTermMemory onComplete={nextStage} onLogResponse={addResponse} language={language} isMuted={isMuted} />
