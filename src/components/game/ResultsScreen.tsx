@@ -56,7 +56,7 @@ export default function ResultsScreen({ session, language, onGoToDashboard }: Pr
         // Insert into scores table
         const { data: aqData } = await supabase.from("aq_assessments").select("total_score").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1);
         const aqScore = aqData && aqData.length > 0 ? (aqData[0] as any).total_score : 0;
-        await supabase.from("scores").insert({
+        const { error: scoresError } = await supabase.from("scores").insert({
           email: user.email || "",
           short_term_score: stCorrect,
           long_term_score: ltCorrect,
@@ -65,6 +65,7 @@ export default function ResultsScreen({ session, language, onGoToDashboard }: Pr
           total_score: totalScore,
           aq_assessment: aqScore,
         } as any);
+        if (scoresError) console.error("Scores insert error:", scoresError);
 
         if (sessionData) {
           const responses = session.responses.map((r) => ({
