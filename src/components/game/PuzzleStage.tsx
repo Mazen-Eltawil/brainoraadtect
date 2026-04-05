@@ -77,6 +77,13 @@ function PuzzleGrid({ config, stageNum, onFinish, language }: {
 }) {
   const reducerFn = useCallback(createReducer(config), [config]);
   const [state, dispatch] = useReducer(reducerFn, { currentPos: null, path: [], hasKey: false, status: "idle" });
+
+  // Auto-reset when config changes (new stage)
+  const configRef = useRef(config);
+  if (configRef.current !== config) {
+    configRef.current = config;
+    dispatch({ type: "RESET" });
+  }
   const startTimeRef = useRef(Date.now());
 
   const handleTileClick = useCallback((row: number, col: number) => {
