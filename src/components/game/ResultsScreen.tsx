@@ -22,11 +22,13 @@ export default function ResultsScreen({ session, language, onGoToDashboard }: Pr
   const longTermResponses = session.responses.filter((r) => r.stage === "long_term");
   const stCorrect = shortTermResponses.filter((r) => r.isCorrect).length;
   const ltCorrect = longTermResponses.filter((r) => r.isCorrect).length;
-  const puzzleScore = session.puzzleRuns.reduce((s, r) => s + r.score, 0);
-  const puzzleScoreRounded = Math.round(puzzleScore * 10) / 10;
+  const p1 = session.puzzleRuns[0]?.score ?? 0;
+  const p2 = session.puzzleRuns[1]?.score ?? 0;
+  const p3 = session.puzzleRuns[2]?.score ?? 0;
+  const puzzleTotal = Math.round((p1 + p2 + p3) * 10) / 10;
   const reorderCorrect = session.reorderingCorrect;
-  const totalScore = stCorrect + ltCorrect + (reorderCorrect ? 1 : 0) + puzzleScoreRounded;
-  const maxScore = shortTermResponses.length + longTermResponses.length + 1 + 3; // reorder(1) + puzzle(3)
+  const totalScore = stCorrect + ltCorrect + (reorderCorrect ? 1 : 0) + puzzleTotal;
+  const maxScore = shortTermResponses.length + longTermResponses.length + 1 + 3;
 
   useEffect(() => {
     const saveResults = async () => {
@@ -35,52 +37,23 @@ export default function ResultsScreen({ session, language, onGoToDashboard }: Pr
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        const { data: sessionData } = await supabase.from("game_sessions").insert({
-          user_id: user.id,
-          start_time: session.startTime,
-          end_time: new Date().toISOString(),
-          short_term_score: stCorrect,
-          short_term_total: shortTermResponses.length,
-          long_term_score: ltCorrect,
-          long_term_total: longTermResponses.length,
-          reordering_correct: reorderCorrect,
-          reordering_answer: session.reorderingAnswer,
-          puzzle_success: session.puzzleRuns.every(r => r.success),
-          puzzle_steps: session.puzzleRuns.reduce((s, r) => s + r.path.length, 0),
-          puzzle_duration_ms: session.puzzleRuns.reduce((s, r) => s + r.durationMs, 0),
-          puzzle_path: session.puzzleRuns.map(r => r.path),
-          total_score: totalScore,
-          max_score: maxScore,
-        } as any).select().single();
-
-        // Insert into scores table
+        // Get AQ score
         const { data: aqData } = await supabase.from("aq_assessments").select("total_score").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1);
         const aqScore = aqData && aqData.length > 0 ? (aqData[0] as any).total_score : 0;
+
         const { error: scoresError } = await supabase.from("scores").insert({
           email: user.email || "",
           short_term_score: stCorrect,
           long_term_score: ltCorrect,
           reordering_correct: reorderCorrect,
-          puzzle_score: puzzleScoreRounded,
+          puzzle_stage1_score: p1,
+          puzzle_stage2_score: p2,
+          puzzle_stage3_score: p3,
           total_score: totalScore,
           aq_assessment: aqScore,
         } as any);
         if (scoresError) console.error("Scores insert error:", scoresError);
 
-        if (sessionData) {
-          const responses = session.responses.map((r) => ({
-            session_id: (sessionData as any).id,
-            user_id: user.id,
-            stage: r.stage,
-            target: r.target,
-            selected: r.selected,
-            is_correct: r.isCorrect,
-            response_time_ms: r.responseTimeMs,
-          }));
-          if (responses.length > 0) {
-            await supabase.from("game_responses").insert(responses as any);
-          }
-        }
         setSaved(true);
         setTimeout(() => setShowRating(true), 800);
       } catch (e) {
@@ -116,9 +89,9 @@ export default function ResultsScreen({ session, language, onGoToDashboard }: Pr
             </div>
             <div className="rounded-lg border border-border p-4">
               <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">{t(language, gameCopy.results.puzzle)}</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{puzzleScoreRounded}/3</p>
+              <p className="mt-1 text-2xl font-bold text-foreground">{puzzleTotal}/3</p>
               <p className="text-sm text-muted-foreground">
-                {session.puzzleRuns.map((r, i) => `S${i + 1}: ${r.score.toFixed(1)}`).join(" · ")}
+                S1: {p1.toFixed(1)} · S2: {p2.toFixed(1)} · S3: {p3.toFixed(1)}
               </p>
             </div>
           </div>

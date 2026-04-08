@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Eye, X } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { gameCopy, Language, t } from "@/lib/gameCopy";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -19,19 +19,12 @@ interface ScoreRow {
   short_term_score: number;
   long_term_score: number;
   reordering_correct: boolean;
-  puzzle_score: number;
+  puzzle_stage1_score: number;
+  puzzle_stage2_score: number;
+  puzzle_stage3_score: number;
   total_score: number;
   aq_assessment: number;
   created_at: string;
-}
-
-interface ResponseRow {
-  id: string;
-  stage: string;
-  target: string;
-  selected: string;
-  is_correct: boolean;
-  response_time_ms: number;
 }
 
 export default function ProfilePage({ language, userId, email, displayName, onBack }: Props) {
@@ -58,13 +51,15 @@ export default function ProfilePage({ language, userId, email, displayName, onBa
           <table className="w-full text-sm">
             <thead className="bg-muted/50">
               <tr>
-                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">Email</th>
-                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">Short-term</th>
-                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">Long-term</th>
-                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">Reordering</th>
-                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">Puzzle</th>
-                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">Total Score</th>
-                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">AQ© Score</th>
+                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.profile.name)}</th>
+                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.profile.shortTerm)}</th>
+                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.profile.longTerm)}</th>
+                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.profile.reordering)}</th>
+                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">Puzzle 1</th>
+                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">Puzzle 2</th>
+                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">Puzzle 3</th>
+                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">AQ©</th>
+                <th className="whitespace-nowrap p-3 text-left font-semibold text-muted-foreground">{t(language, gameCopy.profile.finalScore)}</th>
               </tr>
             </thead>
             <tbody>
@@ -74,9 +69,11 @@ export default function ProfilePage({ language, userId, email, displayName, onBa
                   <td className="p-3 text-foreground">{s.short_term_score}</td>
                   <td className="p-3 text-foreground">{s.long_term_score}</td>
                   <td className="p-3 text-foreground">{s.reordering_correct ? 1 : 0}</td>
-                  <td className="p-3 text-foreground">{(s.puzzle_score ?? 0).toFixed(1)}/3</td>
-                  <td className="p-3 font-bold text-primary">{s.total_score}</td>
+                  <td className="p-3 text-foreground">{Number(s.puzzle_stage1_score ?? 0).toFixed(1)}</td>
+                  <td className="p-3 text-foreground">{Number(s.puzzle_stage2_score ?? 0).toFixed(1)}</td>
+                  <td className="p-3 text-foreground">{Number(s.puzzle_stage3_score ?? 0).toFixed(1)}</td>
                   <td className="p-3 text-foreground">{s.aq_assessment}</td>
+                  <td className="p-3 font-bold text-primary">{s.total_score}</td>
                 </tr>
               ))}
             </tbody>

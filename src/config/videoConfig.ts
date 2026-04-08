@@ -19,7 +19,8 @@ export const DISTRACTOR_CLIPS: ClipConfig[] = [
   { label: "Clip C", src: "/videos/distractor-3.mp4", id: "d3" },
 ];
 
-export const CLIP_ORDER = ["fasla", "sixEight", "money", "marshmallow"] as const;
+// 6 8 is LAST in learning+short-term order
+export const CLIP_ORDER = ["fasla", "money", "marshmallow", "sixEight"] as const;
 export const REPS_PER_CLIP = 3;
 
 /** Audio files per clip for the short-term memory intro — language-aware */
@@ -33,7 +34,6 @@ export const CLIP_AUDIO: Record<string, Record<Language, string>> = {
 /** Get language-aware audio path for a stage */
 export function getAudioSrc(basePath: string, language: Language): string {
   if (language === "ar") {
-    // Convert "/audio/stage1.mp3" → "/audio/stage1-ar.mp3"
     return basePath.replace(/\.mp3$/, "-ar.mp3");
   }
   return basePath;

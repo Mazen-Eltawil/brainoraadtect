@@ -55,13 +55,13 @@ export const gameCopy = {
   learning: {
     stageTitle: { en: "Stage 1 – Learning Phase", ar: "المرحلة 1 – مرحلة التعلّم" },
     stageDescription: {
-      en: "You will watch 4 different dance movement clips. Each clip will play 3 times so you can memorize the movement and its name. After each clip's 3 repetitions, you'll be tested on it immediately.",
-      ar: "ستشاهد 4 مقاطع رقص مختلفة. سيتم تشغيل كل مقطع 3 مرات حتى تتمكن من حفظ الحركة واسمها. بعد كل 3 تكرارات ستُختبر فوراً.",
+      en: "You will watch 4 different dance movement clips. Each clip will play 3 times so you can memorize the movement and its name. After each clip's 3 repetitions, you'll be tested on it immediately. You can skip to the test after watching the first repetition.",
+      ar: "ستشاهد 4 مقاطع رقص مختلفة. سيتم تشغيل كل مقطع 3 مرات حتى تتمكن من حفظ الحركة واسمها. بعد كل 3 تكرارات ستُختبر فوراً. يمكنك التخطي للاختبار بعد مشاهدة التكرار الأول.",
     },
     instructionsLabel: { en: "Instructions", ar: "التعليمات" },
     instructions: {
-      en: "Watch each dancing video 3 times carefully — you will be tested on it right after.",
-      ar: "شاهد كل فيديو رقص 3 مرات بعناية — ستُختبر عليه مباشرة بعد ذلك.",
+      en: "Watch each dancing video carefully — you will be tested on it right after. You can skip to the test after the first viewing.",
+      ar: "شاهد كل فيديو رقص بعناية — ستُختبر عليه مباشرة بعد ذلك. يمكنك التخطي للاختبار بعد المشاهدة الأولى.",
     },
     nowLearning: { en: "Now learning:", ar: "تتعلم الآن:" },
     remember: { en: "Watch the movement and remember the label.", ar: "شاهد الحركة وتذكّر الاسم." },
@@ -114,10 +114,8 @@ export const gameCopy = {
     ruleStart: { en: "• Start on the START tile", ar: "• ابدأ من خانة START" },
     ruleAdjacent: { en: "• Move to any adjacent tile (including diagonals)", ar: "• تحرك إلى أي خانة مجاورة بما في ذلك القطرية" },
     ruleNoRevisit: { en: "• No revisiting tiles", ar: "• ممنوع زيارة نفس الخانة مرة أخرى" },
-    ruleSand: { en: "• Visit all sand tiles", ar: "• زر جميع خانات الرمل" },
     ruleCrabs: { en: "• Avoid crabs 🦀", ar: "• تجنب السرطانات 🦀" },
     ruleKey: { en: "• Collect the key before the chest", ar: "• اجمع المفتاح قبل الصندوق" },
-    sandTiles: { en: "Sand tiles", ar: "خانات الرمل" },
     key: { en: "Key", ar: "المفتاح" },
     collected: { en: "✅ Collected", ar: "✅ تم جمعه" },
     notCollected: { en: "❌ Not collected", ar: "❌ لم يتم جمعه" },
@@ -129,7 +127,6 @@ export const gameCopy = {
       success: { en: "🎉 Congratulations! Puzzle completed successfully!", ar: "🎉 رائع! تم حل اللغز بنجاح!" },
       fail_crab: { en: "🦀 You stepped on a crab. Puzzle failed.", ar: "🦀 لقد وقفت على سرطان. فشل اللغز." },
       fail_no_key: { en: "🔒 Chest is locked — you did not collect the key.", ar: "🔒 الصندوق مقفل — لم تجمع المفتاح." },
-      fail_incomplete: { en: "⚠️ You haven't visited all sand tiles yet.", ar: "⚠️ لم تزر جميع خانات الرمل بعد." },
     },
   },
   longTerm: {

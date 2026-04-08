@@ -13,7 +13,7 @@ interface Props {
   language: Language;
 }
 
-type PuzzleStatus = "idle" | "playing" | "success" | "fail_crab" | "fail_no_key" | "fail_incomplete";
+type PuzzleStatus = "idle" | "playing" | "success" | "fail_crab" | "fail_no_key";
 
 interface PuzzleState {
   currentPos: [number, number] | null;
@@ -48,8 +48,6 @@ function createReducer(config: PuzzleConfig) {
         const newHasKey = state.hasKey || posEq(pos, config.keyPos);
         if (tileType === "chest") {
           if (!newHasKey) return { ...state, path: newPath, currentPos: pos, hasKey: newHasKey, status: "fail_no_key" };
-          const visitedSand = config.safeSandTiles.every((st) => newPath.some((p) => posEq(p, st)));
-          if (!visitedSand) return { ...state, path: newPath, currentPos: pos, hasKey: newHasKey, status: "fail_incomplete" };
           return { ...state, path: newPath, currentPos: pos, hasKey: newHasKey, status: "success" };
         }
         return { ...state, path: newPath, currentPos: pos, hasKey: newHasKey };
@@ -65,10 +63,10 @@ const TILE_IMAGES: Partial<Record<TileType, string>> = {
 
 function calcScore(state: PuzzleState, config: PuzzleConfig): number {
   if (state.status === "success") return 1.0;
-  // Partial credit: ratio of safe tiles visited
-  const totalRequired = config.safeSandTiles.length + 2; // sand + key + chest
+  // Partial credit based on path length vs total non-crab tiles
+  const totalNonCrab = config.grid.flat().filter(t => t !== "crab").length;
   const visited = state.path.length - 1; // exclude start
-  const ratio = Math.min(visited / totalRequired, 0.9);
+  const ratio = Math.min(visited / totalNonCrab, 0.9);
   return Math.round(ratio * 10) / 10;
 }
 
@@ -108,8 +106,7 @@ function PuzzleGrid({ config, stageNum, onFinish, language }: {
 
   const handleRetry = useCallback(() => { dispatch({ type: "RESET" }); }, []);
 
-  const isFinished = ["success", "fail_crab", "fail_no_key", "fail_incomplete"].includes(state.status);
-  const visitedSandCount = config.safeSandTiles.filter((st) => state.path.some((p) => posEq(p, st))).length;
+  const isFinished = ["success", "fail_crab", "fail_no_key"].includes(state.status);
 
   const statusMessages: Record<PuzzleStatus, string> = {
     idle: t(language, gameCopy.puzzle.status.idle),
@@ -117,7 +114,6 @@ function PuzzleGrid({ config, stageNum, onFinish, language }: {
     success: t(language, gameCopy.puzzle.status.success),
     fail_crab: t(language, gameCopy.puzzle.status.fail_crab),
     fail_no_key: t(language, gameCopy.puzzle.status.fail_no_key),
-    fail_incomplete: t(language, gameCopy.puzzle.status.fail_incomplete),
   };
 
   const lastTileAnim = isFinished && state.currentPos ? state.status : null;
@@ -184,13 +180,11 @@ function PuzzleGrid({ config, stageNum, onFinish, language }: {
             <li>{t(language, gameCopy.puzzle.ruleStart)}</li>
             <li>{t(language, gameCopy.puzzle.ruleAdjacent)}</li>
             <li>{t(language, gameCopy.puzzle.ruleNoRevisit)}</li>
-            <li>{t(language, gameCopy.puzzle.ruleSand)}</li>
             <li>{t(language, gameCopy.puzzle.ruleCrabs)}</li>
             <li>{t(language, gameCopy.puzzle.ruleKey)}</li>
           </ul>
         </div>
         <div className="space-y-2 rounded-xl border border-border bg-surface p-4 shadow-sm">
-          <p className="text-sm text-muted-foreground">{t(language, gameCopy.puzzle.sandTiles)}: <strong className="text-foreground">{visitedSandCount}/{config.safeSandTiles.length}</strong></p>
           <p className="text-sm text-muted-foreground">{t(language, gameCopy.puzzle.key)}: <strong className="text-foreground">{state.hasKey ? t(language, gameCopy.puzzle.collected) : t(language, gameCopy.puzzle.notCollected)}</strong></p>
           <p className="text-sm font-medium text-foreground">{statusMessages[state.status]}</p>
         </div>
