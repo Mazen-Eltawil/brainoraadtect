@@ -41,110 +41,6 @@ export type Database = {
         }
         Relationships: []
       }
-      game_responses: {
-        Row: {
-          created_at: string
-          id: string
-          is_correct: boolean
-          response_time_ms: number
-          selected: string
-          session_id: string
-          stage: string
-          target: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          is_correct: boolean
-          response_time_ms: number
-          selected: string
-          session_id: string
-          stage: string
-          target: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          is_correct?: boolean
-          response_time_ms?: number
-          selected?: string
-          session_id?: string
-          stage?: string
-          target?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "game_responses_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "game_sessions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      game_sessions: {
-        Row: {
-          created_at: string
-          end_time: string | null
-          id: string
-          long_term_score: number | null
-          long_term_total: number | null
-          max_score: number | null
-          puzzle_duration_ms: number | null
-          puzzle_path: Json | null
-          puzzle_steps: number | null
-          puzzle_success: boolean | null
-          reordering_answer: string | null
-          reordering_correct: boolean | null
-          short_term_score: number | null
-          short_term_total: number | null
-          start_time: string
-          total_score: number | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          end_time?: string | null
-          id?: string
-          long_term_score?: number | null
-          long_term_total?: number | null
-          max_score?: number | null
-          puzzle_duration_ms?: number | null
-          puzzle_path?: Json | null
-          puzzle_steps?: number | null
-          puzzle_success?: boolean | null
-          reordering_answer?: string | null
-          reordering_correct?: boolean | null
-          short_term_score?: number | null
-          short_term_total?: number | null
-          start_time?: string
-          total_score?: number | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          end_time?: string | null
-          id?: string
-          long_term_score?: number | null
-          long_term_total?: number | null
-          max_score?: number | null
-          puzzle_duration_ms?: number | null
-          puzzle_path?: Json | null
-          puzzle_steps?: number | null
-          puzzle_success?: boolean | null
-          reordering_answer?: string | null
-          reordering_correct?: boolean | null
-          short_term_score?: number | null
-          short_term_total?: number | null
-          start_time?: string
-          total_score?: number | null
-          user_id?: string
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           aq_completed: boolean
@@ -182,7 +78,9 @@ export type Database = {
           email: string
           id: string
           long_term_score: number | null
-          puzzle_score: number | null
+          puzzle_stage1_score: number | null
+          puzzle_stage2_score: number | null
+          puzzle_stage3_score: number | null
           reordering_correct: boolean | null
           short_term_score: number | null
           total_score: number | null
@@ -193,7 +91,9 @@ export type Database = {
           email: string
           id?: string
           long_term_score?: number | null
-          puzzle_score?: number | null
+          puzzle_stage1_score?: number | null
+          puzzle_stage2_score?: number | null
+          puzzle_stage3_score?: number | null
           reordering_correct?: boolean | null
           short_term_score?: number | null
           total_score?: number | null
@@ -204,7 +104,9 @@ export type Database = {
           email?: string
           id?: string
           long_term_score?: number | null
-          puzzle_score?: number | null
+          puzzle_stage1_score?: number | null
+          puzzle_stage2_score?: number | null
+          puzzle_stage3_score?: number | null
           reordering_correct?: boolean | null
           short_term_score?: number | null
           total_score?: number | null
