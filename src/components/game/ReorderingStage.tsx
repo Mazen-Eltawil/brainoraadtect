@@ -41,8 +41,8 @@ export default function ReorderingStage({ onComplete, onResult, language }: Prop
         language={language}
       />
 
-      {/* Segment images display — 3x2 grid, bigger images */}
-      <div className="mb-8 grid grid-cols-3 gap-4">
+      {/* Segment images display — 2x3 grid (bigger for elderly) */}
+      <div className="mb-8 grid grid-cols-2 gap-4">
         {shuffledSegments.map((seg) => (
           <div key={seg.id} className="group relative overflow-hidden rounded-xl border-2 border-border bg-card shadow-md transition-shadow hover:shadow-lg">
             <img
@@ -52,7 +52,7 @@ export default function ReorderingStage({ onComplete, onResult, language }: Prop
               loading="eager"
             />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-foreground/80 to-transparent py-2 text-center">
-              <span className="text-xl font-extrabold tracking-wide text-background drop-shadow-sm">{seg.id}</span>
+              <span className="text-xl font-extrabold tracking-wide text-background drop-shadow-sm" style={{ direction: "ltr", unicodeBidi: "embed" }}>{seg.id}</span>
             </div>
           </div>
         ))}
@@ -76,7 +76,7 @@ export default function ReorderingStage({ onComplete, onResult, language }: Prop
               }`}
             >
               <span className="mb-1 block text-xs font-bold uppercase tracking-widest text-muted-foreground">{opt.label})</span>
-              <span className="text-base font-semibold text-foreground">{opt.sequence.join(" → ")}</span>
+              <span className="text-base font-semibold text-foreground" style={{ direction: "ltr", unicodeBidi: "embed" }}>{opt.sequence.join(" → ")}</span>
               {showResult && (isCorrect || isSelected) && (
                 <span className="absolute right-2 top-2">
                   {isCorrect ? <CheckCircle className="h-5 w-5 text-success" /> : <XCircle className="h-5 w-5 text-destructive" />}

@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, SkipForward } from "lucide-react";
 import { GAME_CLIPS, CLIP_ORDER, REPS_PER_CLIP, DISTRACTOR_CLIPS, CLIP_AUDIO, ClipConfig, getAudioSrc } from "@/config/videoConfig";
 import { ResponseLog } from "@/types/game";
 import { gameCopy, Language, t } from "@/lib/gameCopy";
@@ -32,11 +32,17 @@ export default function LearningWithTest({ onComplete, onLogLearning, onLogRespo
   const [phase, setPhase] = useState<Phase>("learning");
   const [playing, setPlaying] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
+  const [hasCompletedFirstRep, setHasCompletedFirstRep] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const startTimeRef = useRef(Date.now());
 
   const currentKey = CLIP_ORDER[clipIndex];
   const currentClip = GAME_CLIPS[currentKey];
+
+  // Reset first-rep flag when clip changes
+  useEffect(() => {
+    setHasCompletedFirstRep(false);
+  }, [clipIndex]);
 
   const testOptions = useMemo(() => {
     const correct = GAME_CLIPS[currentKey];
@@ -63,10 +69,22 @@ export default function LearningWithTest({ onComplete, onLogLearning, onLogRespo
     }
   }, [isMuted]);
 
+  const handleSkipToTest = useCallback(() => {
+    // Log remaining reps as skipped
+    for (let r = rep; r < REPS_PER_CLIP; r++) {
+      onLogLearning(currentClip.label, r + 1, false);
+    }
+    if (videoRef.current) videoRef.current.pause();
+    setPlaying(false);
+    setPhase("testing");
+    startTimeRef.current = Date.now();
+  }, [rep, currentClip.label, onLogLearning]);
+
   const handleEnded = useCallback(() => {
     onLogLearning(currentClip.label, rep + 1, true);
     setPlaying(false);
     const nextRep = rep + 1;
+    if (nextRep >= 1) setHasCompletedFirstRep(true);
     if (nextRep < REPS_PER_CLIP) {
       setRep(nextRep);
     } else {
@@ -127,10 +145,10 @@ export default function LearningWithTest({ onComplete, onLogLearning, onLogRespo
         />
         <div className="mb-6 rounded-xl border border-border bg-surface p-6 text-center shadow-sm">
           <p className="mb-2 text-sm uppercase tracking-widest text-muted-foreground">{t(language, gameCopy.shortTerm.prompt)}</p>
-          <p className="text-4xl font-bold tracking-tight text-primary">{currentClip.label}</p>
+          <p className="text-4xl font-bold tracking-tight text-primary" style={{ direction: "ltr", unicodeBidi: "embed" }}>{currentClip.label}</p>
           <p className="mt-2 text-muted-foreground">{t(language, gameCopy.shortTerm.helper)}</p>
         </div>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4">
           {testOptions.map((clip) => {
             const isCorrect = clip.id === currentClip.id;
             const isSelected = selected === clip.id;
@@ -186,7 +204,7 @@ export default function LearningWithTest({ onComplete, onLogLearning, onLogRespo
           <p className="mb-4 leading-relaxed text-foreground">{t(language, gameCopy.learning.instructions)}</p>
           <div className="mb-3 rounded-lg bg-primary/10 p-4">
             <p className="text-sm text-muted-foreground">{t(language, gameCopy.learning.nowLearning)}</p>
-            <p className="text-2xl font-bold text-primary">{currentClip.label}</p>
+            <p className="text-2xl font-bold text-primary" style={{ direction: "ltr", unicodeBidi: "embed" }}>{currentClip.label}</p>
           </div>
           <p className="text-sm text-muted-foreground">{t(language, gameCopy.learning.remember)}</p>
         </div>
@@ -199,14 +217,22 @@ export default function LearningWithTest({ onComplete, onLogLearning, onLogRespo
           </motion.div>
         </AnimatePresence>
         <div className="mt-4 flex w-full items-center justify-between gap-3">
-          <span className="text-sm text-muted-foreground">
+          <span className="text-sm text-muted-foreground" style={{ direction: "ltr", unicodeBidi: "embed" }}>
             {t(language, gameCopy.learning.clipCounter)} {clipIndex + 1}/{CLIP_ORDER.length} · {t(language, gameCopy.learning.repetition)} {rep + 1}/{REPS_PER_CLIP}
           </span>
-          {!playing && (
-            <Button onClick={handlePlay} variant="default">
-              {rep === 0 && clipIndex === 0 ? t(language, gameCopy.learning.playClip) : t(language, gameCopy.learning.playAgain)}
-            </Button>
-          )}
+          <div className="flex gap-2">
+            {hasCompletedFirstRep && !playing && (
+              <Button onClick={handleSkipToTest} variant="outline" className="gap-1">
+                <SkipForward className="h-4 w-4" />
+                {language === "ar" ? "تخطي للاختبار" : "Skip to Test"}
+              </Button>
+            )}
+            {!playing && (
+              <Button onClick={handlePlay} variant="default">
+                {rep === 0 && clipIndex === 0 ? t(language, gameCopy.learning.playClip) : t(language, gameCopy.learning.playAgain)}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </motion.div>

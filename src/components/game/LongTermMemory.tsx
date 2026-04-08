@@ -91,7 +91,7 @@ export default function LongTermMemory({ onComplete, onLogResponse, language, is
                   : "border-border bg-surface text-foreground hover:border-primary/50"
               }`}
             >
-              {label}
+              <span style={{ direction: "ltr", unicodeBidi: "embed" }}>{label}</span>
               {showResult && isCorrect && <CheckCircle className="h-5 w-5 text-success" />}
               {showResult && isSelected && !isCorrect && <XCircle className="h-5 w-5 text-destructive" />}
             </motion.button>

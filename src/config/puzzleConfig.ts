@@ -19,23 +19,11 @@ export interface PuzzleConfig {
   startPos: [number, number];
   chestPos: [number, number];
   keyPos: [number, number];
-  safeSandTiles: [number, number][];
 }
 
-// Stage 1: crabs at (0,1) and (2,1) — original-ish
+// Swapped: old stage 2 is now stage 1, old stage 1 is now stage 2
 export const PUZZLE_STAGES: PuzzleConfig[] = [
-  {
-    grid: [
-      ["empty", "crab", "chest"],
-      ["empty", "empty", "empty"],
-      ["start", "crab", "key"],
-    ],
-    startPos: [2, 0],
-    chestPos: [0, 2],
-    keyPos: [2, 2],
-    safeSandTiles: [[0, 0], [1, 0], [1, 1], [1, 2]],
-  },
-  // Stage 2: crabs at (0,0) and (1,1) — blocks the middle
+  // Stage 1 (was stage 2): crabs at (0,0) and (1,1)
   {
     grid: [
       ["crab", "empty", "chest"],
@@ -45,7 +33,17 @@ export const PUZZLE_STAGES: PuzzleConfig[] = [
     startPos: [2, 0],
     chestPos: [0, 2],
     keyPos: [2, 2],
-    safeSandTiles: [[0, 1], [1, 0], [1, 2], [2, 1]],
+  },
+  // Stage 2 (was stage 1): crabs at (0,1) and (2,1)
+  {
+    grid: [
+      ["empty", "crab", "chest"],
+      ["empty", "empty", "empty"],
+      ["start", "crab", "key"],
+    ],
+    startPos: [2, 0],
+    chestPos: [0, 2],
+    keyPos: [2, 2],
   },
   // Stage 3: crabs at (1,0), (0,1), and (2,1) — hardest, 3 crabs
   {
@@ -57,7 +55,6 @@ export const PUZZLE_STAGES: PuzzleConfig[] = [
     startPos: [2, 0],
     chestPos: [0, 2],
     keyPos: [2, 2],
-    safeSandTiles: [[0, 0], [1, 1], [1, 2]],
   },
 ];
 
@@ -66,7 +63,6 @@ export const GRID_MAP = PUZZLE_STAGES[0].grid;
 export const START_POS = PUZZLE_STAGES[0].startPos;
 export const CHEST_POS = PUZZLE_STAGES[0].chestPos;
 export const KEY_POS = PUZZLE_STAGES[0].keyPos;
-export const SAFE_SAND_TILES = PUZZLE_STAGES[0].safeSandTiles;
 
 export const REORDERING_OPTIONS = [
   { label: "a", sequence: [1, 6, 3, 5, 4, 2] },

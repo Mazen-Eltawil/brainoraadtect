@@ -29,6 +29,7 @@ export function useGameState() {
     }
     if (idx < STAGE_ORDER.length - 1) {
       let next = STAGE_ORDER[idx + 1];
+      // Skip the standalone short_term stage (it's integrated into learning)
       if (next === "short_term") {
         next = STAGE_ORDER[idx + 2];
       }
@@ -44,7 +45,6 @@ export function useGameState() {
     setSession(prev => prev ? { ...prev, puzzleRuns: runs, puzzleRun: runs[runs.length - 1] || null } : prev);
   }, []);
 
-  // Legacy compat
   const setPuzzleRun = useCallback((run: PuzzleRunLog) => {
     setSession(prev => prev ? { ...prev, puzzleRun: run, puzzleRuns: [run] } : prev);
   }, []);
