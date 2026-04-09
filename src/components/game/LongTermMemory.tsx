@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { GAME_CLIPS, CLIP_ORDER, getAudioSrc } from "@/config/videoConfig";
+import { GAME_CLIPS, CLIP_ORDER, getAudioSrc, getClipLabel } from "@/config/videoConfig";
 import { CheckCircle, XCircle, RotateCcw } from "lucide-react";
 import { ResponseLog } from "@/types/game";
 import { gameCopy, Language, t } from "@/lib/gameCopy";
@@ -32,8 +32,12 @@ export default function LongTermMemory({ onComplete, onLogResponse, language, is
   const questions = useMemo(() => {
     return CLIP_ORDER.map((key) => {
       const correct = GAME_CLIPS[key];
-      const allLabels = CLIP_ORDER.map((k) => GAME_CLIPS[k].label);
-      return { clipKey: key, clipSrc: correct.src, correctLabel: correct.label, options: shuffleArray(allLabels) };
+      const allOptions = CLIP_ORDER.map((k) => ({
+        key: k,
+        label: GAME_CLIPS[k].label,
+        label_ar: GAME_CLIPS[k].label_ar,
+      }));
+      return { clipKey: key, clipSrc: correct.src, correctKey: key, options: shuffleArray(allOptions) };
     });
   }, []);
 
@@ -52,15 +56,18 @@ export default function LongTermMemory({ onComplete, onLogResponse, language, is
     }
   }, []);
 
-  const handleSelect = useCallback((label: string) => {
+  const correctLabel = GAME_CLIPS[q.correctKey].label;
+
+  const handleSelect = useCallback((optKey: string) => {
     if (selected) return;
-    setSelected(label);
+    setSelected(optKey);
+    const selectedLabel = GAME_CLIPS[optKey]?.label ?? optKey;
     onLogResponse({
-      stage: "long_term", target: q.correctLabel, selected: label,
-      isCorrect: label === q.correctLabel, responseTimeMs: Date.now() - startTimeRef.current,
+      stage: "long_term", target: correctLabel, selected: selectedLabel,
+      isCorrect: optKey === q.correctKey, responseTimeMs: Date.now() - startTimeRef.current,
       timestamp: new Date().toISOString(),
     });
-  }, [selected, q, onLogResponse]);
+  }, [selected, q, correctLabel, onLogResponse]);
 
   const handleNext = useCallback(() => {
     if (qIndex + 1 < questions.length) {
@@ -100,19 +107,20 @@ export default function LongTermMemory({ onComplete, onLogResponse, language, is
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3">
-        {q.options.map((label) => {
-          const isCorrect = label === q.correctLabel;
-          const isSelected = selected === label;
+        {q.options.map((opt) => {
+          const isCorrect = opt.key === q.correctKey;
+          const isSelected = selected === opt.key;
           const showResult = selected !== null;
+          const displayLabel = language === "ar" ? opt.label_ar : opt.label;
           return (
-            <motion.button key={label} whileTap={{ scale: 0.96 }} onClick={() => handleSelect(label)} disabled={!!selected}
+            <motion.button key={opt.key} whileTap={{ scale: 0.96 }} onClick={() => handleSelect(opt.key)} disabled={!!selected}
               className={`flex items-center justify-between rounded-lg border-2 p-4 text-lg font-semibold transition-all ${
                 showResult && isCorrect ? "border-success bg-success/5 text-foreground"
                   : showResult && isSelected && !isCorrect ? "border-destructive bg-destructive/5 text-foreground"
                   : "border-border bg-surface text-foreground hover:border-primary/50"
               }`}
             >
-              <span style={{ direction: "ltr", unicodeBidi: "embed" }}>{label}</span>
+              <span style={{ direction: "ltr", unicodeBidi: "embed" }}>{displayLabel}</span>
               {showResult && isCorrect && <CheckCircle className="h-5 w-5 text-success" />}
               {showResult && isSelected && !isCorrect && <XCircle className="h-5 w-5 text-destructive" />}
             </motion.button>
