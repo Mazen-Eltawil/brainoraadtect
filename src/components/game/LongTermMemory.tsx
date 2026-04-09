@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { GAME_CLIPS, CLIP_ORDER, getAudioSrc } from "@/config/videoConfig";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, RotateCcw } from "lucide-react";
 import { ResponseLog } from "@/types/game";
 import { gameCopy, Language, t } from "@/lib/gameCopy";
 import StageIntro from "./StageIntro";
@@ -42,9 +42,15 @@ export default function LongTermMemory({ onComplete, onLogResponse, language, is
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
+
+  const handleRewatch = useCallback(() => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
       void videoRef.current.play().catch(() => {});
     }
-  }, [isMuted, q.clipKey]);
+  }, []);
 
   const handleSelect = useCallback((label: string) => {
     if (selected) return;
@@ -76,7 +82,22 @@ export default function LongTermMemory({ onComplete, onLogResponse, language, is
       />
       <div className="mb-6 rounded-xl border border-border bg-surface p-6 shadow-sm">
         <p className="mb-2 text-sm uppercase tracking-widest text-muted-foreground">{t(language, gameCopy.longTerm.prompt)}</p>
-        <video ref={videoRef} key={q.clipKey} src={q.clipSrc} className="aspect-video w-full rounded-lg border border-border" playsInline autoPlay muted={isMuted} controls={false} />
+        <video
+          ref={videoRef}
+          key={q.clipKey}
+          src={q.clipSrc}
+          className="aspect-video w-full rounded-lg border border-border"
+          playsInline
+          autoPlay
+          muted={isMuted}
+          controls
+        />
+        <div className="mt-3 flex justify-center">
+          <Button variant="outline" size="sm" onClick={handleRewatch} className="gap-2">
+            <RotateCcw className="h-4 w-4" />
+            {language === "ar" ? "إعادة المشاهدة" : "Rewatch"}
+          </Button>
+        </div>
       </div>
       <div className="grid grid-cols-2 gap-3">
         {q.options.map((label) => {
