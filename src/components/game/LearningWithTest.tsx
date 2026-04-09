@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, SkipForward } from "lucide-react";
-import { GAME_CLIPS, CLIP_ORDER, REPS_PER_CLIP, DISTRACTOR_CLIPS, CLIP_AUDIO, ClipConfig, getAudioSrc } from "@/config/videoConfig";
+import { GAME_CLIPS, CLIP_ORDER, REPS_PER_CLIP, DISTRACTOR_CLIPS, CLIP_AUDIO, ClipConfig, getAudioSrc, getClipLabel } from "@/config/videoConfig";
 import { ResponseLog } from "@/types/game";
 import { gameCopy, Language, t } from "@/lib/gameCopy";
 import StageIntro from "./StageIntro";
@@ -145,7 +145,7 @@ export default function LearningWithTest({ onComplete, onLogLearning, onLogRespo
         />
         <div className="mb-6 rounded-xl border border-border bg-surface p-6 text-center shadow-sm">
           <p className="mb-2 text-sm uppercase tracking-widest text-muted-foreground">{t(language, gameCopy.shortTerm.prompt)}</p>
-          <p className="text-4xl font-bold tracking-tight text-primary" style={{ direction: "ltr", unicodeBidi: "embed" }}>{currentClip.label}</p>
+          <p className="text-4xl font-bold tracking-tight text-primary" style={{ direction: "ltr", unicodeBidi: "embed" }}>{getClipLabel(currentClip, language)}</p>
           <p className="mt-2 text-muted-foreground">{t(language, gameCopy.shortTerm.helper)}</p>
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -204,7 +204,7 @@ export default function LearningWithTest({ onComplete, onLogLearning, onLogRespo
           <p className="mb-4 leading-relaxed text-foreground">{t(language, gameCopy.learning.instructions)}</p>
           <div className="mb-3 rounded-lg bg-primary/10 p-4">
             <p className="text-sm text-muted-foreground">{t(language, gameCopy.learning.nowLearning)}</p>
-            <p className="text-2xl font-bold text-primary" style={{ direction: "ltr", unicodeBidi: "embed" }}>{currentClip.label}</p>
+            <p className="text-2xl font-bold text-primary" style={{ direction: "ltr", unicodeBidi: "embed" }}>{getClipLabel(currentClip, language)}</p>
           </div>
           <p className="text-sm text-muted-foreground">{t(language, gameCopy.learning.remember)}</p>
         </div>
