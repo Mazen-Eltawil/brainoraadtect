@@ -80,3 +80,11 @@
     font-family: 'Public Sans', system-ui, sans-serif;
   }
 }
+
+/* Force LTR for numbers/labels that should not flip in RTL */
+.clip-label,
+.stage-number,
+.puzzle-number {
+  direction: ltr !important;
+  unicode-bidi: embed;
+}
