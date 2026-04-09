@@ -71,7 +71,7 @@ export const REORDERING_OPTIONS = [
   { label: "d", sequence: [2, 3, 6, 4, 1, 5] },
   { label: "e", sequence: [2, 1, 5, 6, 4, 3] },
   { label: "f", sequence: [3, 1, 6, 5, 4, 2] },
-  { label: "g", sequence: [1, 5, 3, 2, 6, 4] },
+  { label: "g", sequence: [1, 3, 6, 4, 5, 2] },
   { label: "h", sequence: [3, 6, 2, 4, 5, 1] },
   { label: "i", sequence: [3, 2, 5, 1, 6, 4] },
   { label: "j", sequence: [6, 1, 4, 5, 3, 2] },
