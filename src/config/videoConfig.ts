@@ -7,7 +7,7 @@ export interface ClipConfig {
 }
 
 export const GAME_CLIPS: Record<string, ClipConfig> = {
-  fasla: { label: "Fasla", src: "/videos/fasla.mp4", id: "v1" },
+  fasla: { label: "فاصلة", src: "/videos/fasla.mp4", id: "v1" },
   sixEight: { label: "6 8", src: "/videos/6-8.mp4", id: "v2" },
   money: { label: "Money", src: "/videos/money.mp4", id: "v3" },
   marshmallow: { label: "Marshmallow", src: "/videos/marshmallow.mp4", id: "v4" },
