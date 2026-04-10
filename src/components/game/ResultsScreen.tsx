@@ -41,11 +41,23 @@ export default function ResultsScreen({ session, language, onGoToDashboard }: Pr
         const { data: aqData } = await supabase.from("aq_assessments").select("total_score").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1);
         const aqScore = aqData && aqData.length > 0 ? (aqData[0] as any).total_score : 0;
 
+        const userEmail = user.email || "";
+        
+        // Count existing attempts for this email to determine attempt number
+        const { count } = await supabase
+          .from("scores")
+          .select("*", { count: "exact", head: true })
+          .eq("email", userEmail);
+        
+        const attemptNumber = (count ?? 0) + 1;
+        const scoreId = `${userEmail}${attemptNumber}`;
+
         const { error: scoresError } = await supabase.from("scores").insert({
-          email: user.email || "",
+          id: scoreId,
+          email: userEmail,
           short_term_score: stCorrect,
           long_term_score: ltCorrect,
-          reordering_correct: reorderCorrect,
+          reordering_correct: reorderCorrect ? 1 : 0,
           puzzle_stage1_score: p1,
           puzzle_stage2_score: p2,
           puzzle_stage3_score: p3,
