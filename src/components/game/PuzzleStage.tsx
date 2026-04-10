@@ -169,7 +169,7 @@ function PuzzleGrid({ config, stageNum, onFinish, language }: {
                     backgroundSize: '100px 100px',
                     mixBlendMode: 'multiply',
                   }} />
-                  {tileImg ? <img src={tileImg} alt={tileType} className="relative z-10 h-20 w-20 object-contain drop-shadow-md" /> : null}
+                  {tileImg ? <img src={tileImg} alt={tileType} className="relative z-10 h-24 w-24 object-contain drop-shadow-md" /> : null}
                   {isVisited && !isCurrent && (
                     <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-foreground/10">
                       <span className="text-xs font-bold text-muted-foreground">{state.path.findIndex((p) => posEq(p, [r, c])) + 1}</span>
