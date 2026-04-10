@@ -181,7 +181,7 @@ function PuzzleGrid({ config, stageNum, onFinish, language }: {
           )}
         </div>
         {state.path.length > 1 && (
-          <svg className="pointer-events-none absolute" style={{ width: 450, height: 450 }} viewBox="0 0 450 450">
+          <svg className="pointer-events-none absolute" style={{ width: 460, height: 460 }} viewBox="0 0 460 460">
             <motion.polyline
               points={state.path.map(([r, c]) => `${c * 148 + 86},${r * 148 + 86}`).join(" ")}
               fill="none" stroke="hsl(210, 100%, 45%)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" opacity="0.5"
