@@ -34,25 +34,43 @@ export default function ResultsScreen({ session, language, onGoToDashboard }: Pr
     const saveResults = async () => {
       setSaving(true);
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError) {
+          console.error("Auth error getting user:", authError);
+          return;
+        }
+        if (!user) {
+          console.error("No authenticated user found - cannot save scores");
+          return;
+        }
+
+        console.log("Saving scores for user:", user.email);
 
         // Get AQ score
-        const { data: aqData } = await supabase.from("aq_assessments").select("total_score").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1);
+        const { data: aqData } = await supabase
+          .from("aq_assessments")
+          .select("total_score")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1);
         const aqScore = aqData && aqData.length > 0 ? (aqData[0] as any).total_score : 0;
 
         const userEmail = user.email || "";
         
         // Count existing attempts for this email to determine attempt number
-        const { count } = await supabase
+        const { count, error: countError } = await supabase
           .from("scores")
           .select("*", { count: "exact", head: true })
           .eq("email", userEmail);
         
+        if (countError) {
+          console.error("Error counting attempts:", countError);
+        }
+
         const attemptNumber = (count ?? 0) + 1;
         const scoreId = `${userEmail}${attemptNumber}`;
 
-        const { error: scoresError } = await supabase.from("scores").insert({
+        const insertData = {
           id: scoreId,
           email: userEmail,
           short_term_score: stCorrect,
@@ -61,13 +79,24 @@ export default function ResultsScreen({ session, language, onGoToDashboard }: Pr
           puzzle_stage1_score: p1,
           puzzle_stage2_score: p2,
           puzzle_stage3_score: p3,
-          total_score: totalScore,
+          total_score: Math.round(totalScore),
           aq_assessment: aqScore,
-        } as any);
-        if (scoresError) console.error("Scores insert error:", scoresError);
+        };
 
-        setSaved(true);
-        setTimeout(() => setShowRating(true), 800);
+        console.log("Inserting score data:", JSON.stringify(insertData));
+
+        const { error: scoresError, data: insertedData } = await supabase
+          .from("scores")
+          .insert(insertData as any)
+          .select();
+        
+        if (scoresError) {
+          console.error("Scores insert error:", scoresError);
+        } else {
+          console.log("Score saved successfully:", insertedData);
+          setSaved(true);
+          setTimeout(() => setShowRating(true), 800);
+        }
       } catch (e) {
         console.error("Error saving results:", e);
       } finally {
