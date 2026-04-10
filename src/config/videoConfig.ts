@@ -15,7 +15,7 @@ export function getClipLabel(clip: ClipConfig, language: Language): string {
 export const GAME_CLIPS: Record<string, ClipConfig> = {
   fasla: { label: "Fasla", label_ar: "فصلة", src: "/videos/fasla.mp4", id: "v1" },
   sixEight: { label: "6 8", label_ar: "6 8", src: "/videos/6-8.mp4", id: "v2" },
-  money: { label: "Money", label_ar: "موني", src: "/videos/money.mp4", id: "v3" },
+  money: { label: "Money", label_ar: "بيزه / فلوس", src: "/videos/money.mp4", id: "v3" },
   marshmallow: { label: "Marshmallow", label_ar: "مارشميلو", src: "/videos/marshmallow.mp4", id: "v4" },
 };
 
