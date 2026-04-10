@@ -121,7 +121,7 @@ function PuzzleGrid({ config, stageNum, onFinish, language }: {
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_auto]">
       <div className="relative flex flex-col items-center">
-        <div className="grid grid-cols-3 grid-rows-3 gap-1 rounded-xl p-4" style={{ width: 450, height: 450, background: "linear-gradient(135deg, hsl(40, 30%, 90%), hsl(40, 20%, 85%))", direction: "ltr" }}>
+        <div className="grid grid-cols-3 grid-rows-3 gap-2 rounded-xl p-4" style={{ width: 460, height: 460, background: "linear-gradient(135deg, hsl(38, 35%, 82%), hsl(34, 28%, 75%))", direction: "ltr" }}>
           {config.grid.flatMap((row, r) =>
             row.map((tileType, c) => {
               const isVisited = state.path.some((p) => posEq(p, [r, c]));
@@ -130,6 +130,18 @@ function PuzzleGrid({ config, stageNum, onFinish, language }: {
               const isClickable = state.status === "idle" ? r === config.startPos[0] && c === config.startPos[1] : state.status === "playing" && state.currentPos && isAdjacent(state.currentPos, [r, c]) && !isVisited;
               const isLastFail = lastTileAnim && (lastTileAnim === "fail_crab" || lastTileAnim === "fail_no_key") && isCurrent;
               const isSuccessChest = lastTileAnim === "success" && isCurrent;
+
+              // Sandy tile background with grain texture
+              const sandStyle: React.CSSProperties = {
+                width: 140,
+                height: 140,
+                background: `
+                  radial-gradient(ellipse at ${30 + (r * 20)}% ${40 + (c * 15)}%, hsl(39, 45%, 82%) 0%, transparent 70%),
+                  radial-gradient(ellipse at ${70 - (c * 10)}% ${60 + (r * 10)}%, hsl(36, 38%, 76%) 0%, transparent 60%),
+                  linear-gradient(145deg, hsl(40, 42%, 80%) 0%, hsl(37, 35%, 74%) 50%, hsl(35, 30%, 70%) 100%)
+                `,
+                boxShadow: 'inset 0 1px 3px rgba(255,245,220,0.5), inset 0 -2px 4px rgba(160,130,80,0.15), 0 2px 6px rgba(140,110,60,0.2)',
+              };
 
               return (
                 <motion.button
@@ -144,14 +156,20 @@ function PuzzleGrid({ config, stageNum, onFinish, language }: {
                       : {}
                   }
                   transition={isLastFail ? { duration: 0.4 } : isSuccessChest ? { duration: 0.8, repeat: 1 } : {}}
-                  className={`relative flex items-center justify-center rounded-lg border transition-all ${
-                    isCurrent ? "border-primary bg-primary/10 ring-2 ring-primary/30"
-                      : isVisited ? "border-border/50 bg-foreground/5 opacity-50"
-                      : "border-border/30 bg-surface/80"
-                  } ${isClickable ? "cursor-pointer hover:shadow-md" : "cursor-default"}`}
-                  style={{ width: 140, height: 140 }}
+                  className={`relative flex items-center justify-center rounded-xl border-2 transition-all overflow-hidden ${
+                    isCurrent ? "border-primary ring-2 ring-primary/30"
+                      : isVisited ? "border-amber-700/30 opacity-50"
+                      : "border-amber-800/20"
+                  } ${isClickable ? "cursor-pointer hover:shadow-lg hover:border-amber-600/40" : "cursor-default"}`}
+                  style={sandStyle}
                 >
-                  {tileImg ? <img src={tileImg} alt={tileType} className="h-20 w-20 object-contain" /> : <div className="h-full w-full rounded-lg" style={{ background: "hsl(40, 25%, 88%)" }} />}
+                  {/* Sand grain overlay */}
+                  <div className="pointer-events-none absolute inset-0 rounded-xl opacity-40" style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E")`,
+                    backgroundSize: '100px 100px',
+                    mixBlendMode: 'multiply',
+                  }} />
+                  {tileImg ? <img src={tileImg} alt={tileType} className="relative z-10 h-20 w-20 object-contain drop-shadow-md" /> : null}
                   {isVisited && !isCurrent && (
                     <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-foreground/10">
                       <span className="text-xs font-bold text-muted-foreground">{state.path.findIndex((p) => posEq(p, [r, c])) + 1}</span>
