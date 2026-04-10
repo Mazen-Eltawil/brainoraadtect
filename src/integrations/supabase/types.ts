@@ -81,7 +81,7 @@ export type Database = {
           puzzle_stage1_score: number | null
           puzzle_stage2_score: number | null
           puzzle_stage3_score: number | null
-          reordering_correct: boolean | null
+          reordering_correct: number | null
           short_term_score: number | null
           total_score: number | null
         }
@@ -89,12 +89,12 @@ export type Database = {
           aq_assessment?: number | null
           created_at?: string
           email: string
-          id?: string
+          id: string
           long_term_score?: number | null
           puzzle_stage1_score?: number | null
           puzzle_stage2_score?: number | null
           puzzle_stage3_score?: number | null
-          reordering_correct?: boolean | null
+          reordering_correct?: number | null
           short_term_score?: number | null
           total_score?: number | null
         }
@@ -107,7 +107,7 @@ export type Database = {
           puzzle_stage1_score?: number | null
           puzzle_stage2_score?: number | null
           puzzle_stage3_score?: number | null
-          reordering_correct?: boolean | null
+          reordering_correct?: number | null
           short_term_score?: number | null
           total_score?: number | null
         }
