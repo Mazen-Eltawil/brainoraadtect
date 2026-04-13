@@ -41,6 +41,39 @@ export type Database = {
         }
         Relationships: []
       }
+      click_motion_tracking: {
+        Row: {
+          box_ids: Json | null
+          click_coordinates: Json
+          correctness_sequence: Json | null
+          created_at: string
+          email: string
+          id: string
+          total_clicks: number
+          trial_number: number
+        }
+        Insert: {
+          box_ids?: Json | null
+          click_coordinates?: Json
+          correctness_sequence?: Json | null
+          created_at?: string
+          email: string
+          id: string
+          total_clicks?: number
+          trial_number: number
+        }
+        Update: {
+          box_ids?: Json | null
+          click_coordinates?: Json
+          correctness_sequence?: Json | null
+          created_at?: string
+          email?: string
+          id?: string
+          total_clicks?: number
+          trial_number?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           aq_completed: boolean
