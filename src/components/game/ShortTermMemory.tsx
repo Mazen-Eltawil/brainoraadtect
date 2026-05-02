@@ -5,6 +5,7 @@ import { GAME_CLIPS, DISTRACTOR_CLIPS, ClipConfig } from "@/config/videoConfig";
 import { CheckCircle, XCircle } from "lucide-react";
 import { ResponseLog } from "@/types/game";
 import { gameCopy, Language, t } from "@/lib/gameCopy";
+import { MotionClick, normalizeClickCoords, saveMotionTrial } from "@/lib/motionTracking";
 
 interface Props {
   onComplete: () => void;
