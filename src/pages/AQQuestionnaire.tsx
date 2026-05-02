@@ -95,6 +95,7 @@ export default function AQQuestionnaire({ language, userId, onComplete }: Props)
     } catch (e) {
       console.error("Error saving AQ:", e);
     }
+    void saveMotionTrial({ trialNumber: 41, clicks: clicksRef.current });
     setSaving(false);
     setSubmitted(true);
   }, [allAnswered, answers, userId]);
