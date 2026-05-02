@@ -123,14 +123,14 @@ export default function LongTermMemory({ onComplete, onLogResponse, language, is
           </Button>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div ref={optionsRef} className="grid grid-cols-2 gap-3">
         {q.options.map((opt) => {
           const isCorrect = opt.key === q.correctKey;
           const isSelected = selected === opt.key;
           const showResult = selected !== null;
           const displayLabel = language === "ar" ? opt.label_ar : opt.label;
           return (
-            <motion.button key={opt.key} whileTap={{ scale: 0.96 }} onClick={() => handleSelect(opt.key)} disabled={!!selected}
+            <motion.button key={opt.key} whileTap={{ scale: 0.96 }} onClick={(e) => handleSelect(opt.key, e)} disabled={!!selected}
               className={`flex items-center justify-between rounded-lg border-2 p-4 text-lg font-semibold transition-all ${
                 showResult && isCorrect ? "border-success bg-success/5 text-foreground"
                   : showResult && isSelected && !isCorrect ? "border-destructive bg-destructive/5 text-foreground"
