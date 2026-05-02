@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { SIX_EIGHT_SEGMENTS } from "@/config/videoConfig";
@@ -7,6 +7,7 @@ import { CheckCircle, XCircle } from "lucide-react";
 import { gameCopy, Language, t } from "@/lib/gameCopy";
 import { getAudioSrc } from "@/config/videoConfig";
 import StageIntro from "./StageIntro";
+import { MotionClick, normalizeClickCoords, saveMotionTrial } from "@/lib/motionTracking";
 
 interface Props {
   onComplete: () => void;
@@ -16,6 +17,9 @@ interface Props {
 
 export default function ReorderingStage({ onComplete, onResult, language }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
+  const startTimeRef = useRef(Date.now());
+  const clicksRef = useRef<MotionClick[]>([]);
+  const optionsRef = useRef<HTMLDivElement>(null);
 
   const shuffledSegments = useMemo(() => {
     const shuffled = [...SIX_EIGHT_SEGMENTS];
@@ -26,10 +30,26 @@ export default function ReorderingStage({ onComplete, onResult, language }: Prop
     return shuffled;
   }, []);
 
-  const handleSelect = (label: string) => {
+  const handleSelect = (label: string, e: React.MouseEvent<HTMLButtonElement>) => {
     if (selected) return;
+    const isCorrect = label === CORRECT_REORDERING;
+    const coords = normalizeClickCoords(e, optionsRef.current);
+    clicksRef.current.push({
+      x: coords.x,
+      y: coords.y,
+      t: Date.now() - startTimeRef.current,
+      box_id: label,
+      target: CORRECT_REORDERING,
+      selected: label,
+      correct: isCorrect,
+    });
     setSelected(label);
-    onResult(label, label === CORRECT_REORDERING);
+    onResult(label, isCorrect);
+  };
+
+  const handleContinue = () => {
+    void saveMotionTrial({ trialNumber: 21, clicks: clicksRef.current });
+    onComplete();
   };
 
   return (
@@ -58,7 +78,7 @@ export default function ReorderingStage({ onComplete, onResult, language }: Prop
         ))}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      <div ref={optionsRef} className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {REORDERING_OPTIONS.map((opt) => {
           const isCorrect = opt.label === CORRECT_REORDERING;
           const isSelected = selected === opt.label;
@@ -67,7 +87,7 @@ export default function ReorderingStage({ onComplete, onResult, language }: Prop
             <motion.button
               key={opt.label}
               whileTap={{ scale: 0.96 }}
-              onClick={() => handleSelect(opt.label)}
+              onClick={(e) => handleSelect(opt.label, e)}
               disabled={!!selected}
               className={`relative rounded-lg border-2 bg-surface p-3 text-left transition-all ${
                 showResult && isCorrect ? "border-success bg-success/5"
@@ -94,7 +114,7 @@ export default function ReorderingStage({ onComplete, onResult, language }: Prop
               ? t(language, gameCopy.reordering.correct)
               : `${t(language, gameCopy.reordering.incorrectPrefix)} (${REORDERING_OPTIONS.find((o) => o.label === CORRECT_REORDERING)?.sequence.join(" → ")}).`}
           </p>
-          <Button onClick={onComplete} size="lg">{t(language, gameCopy.reordering.continue)}</Button>
+          <Button onClick={handleContinue} size="lg">{t(language, gameCopy.reordering.continue)}</Button>
         </motion.div>
       )}
     </motion.div>

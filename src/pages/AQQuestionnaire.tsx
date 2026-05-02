@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getAudioSrc } from "@/config/videoConfig";
 import StageIntro from "@/components/game/StageIntro";
 import { Volume2, Pause, RotateCcw } from "lucide-react";
+import { MotionClick, normalizeClickCoords, saveMotionTrial } from "@/lib/motionTracking";
 
 interface Props {
   language: Language;
@@ -22,6 +23,9 @@ export default function AQQuestionnaire({ language, userId, onComplete }: Props)
   const [qPlaying, setQPlaying] = useState(false);
   const [qPaused, setQPaused] = useState(false);
   const qAudioRef = useRef<HTMLAudioElement | null>(null);
+  const startTimeRef = useRef(Date.now());
+  const clicksRef = useRef<MotionClick[]>([]);
+  const formRef = useRef<HTMLDivElement>(null);
 
   const allAnswered = AQ_QUESTIONS.every((q) => answers[q.id] !== undefined);
 
@@ -58,8 +62,20 @@ export default function AQQuestionnaire({ language, userId, onComplete }: Props)
     };
   }, []);
 
-  const handleAnswer = useCallback((id: number, val: boolean) => {
+  const handleAnswer = useCallback((id: number, val: boolean, e?: React.MouseEvent<HTMLButtonElement>) => {
     setAnswers((prev) => ({ ...prev, [id]: val }));
+    if (e) {
+      const coords = normalizeClickCoords(e, formRef.current);
+      clicksRef.current.push({
+        x: coords.x,
+        y: coords.y,
+        t: Date.now() - startTimeRef.current,
+        box_id: `q${id}_${val ? "yes" : "no"}`,
+        target: `q${id}`,
+        selected: val ? "yes" : "no",
+        correct: true,
+      });
+    }
   }, []);
 
   const handleSubmit = useCallback(async () => {
@@ -79,6 +95,7 @@ export default function AQQuestionnaire({ language, userId, onComplete }: Props)
     } catch (e) {
       console.error("Error saving AQ:", e);
     }
+    void saveMotionTrial({ trialNumber: 41, clicks: clicksRef.current });
     setSaving(false);
     setSubmitted(true);
   }, [allAnswered, answers, userId]);
@@ -127,7 +144,7 @@ export default function AQQuestionnaire({ language, userId, onComplete }: Props)
         )}
       </div>
 
-      <div className="space-y-6">
+      <div ref={formRef} className="space-y-6">
         {categories.map((cat) => (
           <div key={cat} className="rounded-xl border border-border bg-surface p-5 shadow-sm">
             <h3 className="mb-4 text-sm font-bold uppercase tracking-widest text-primary">{cat}</h3>
@@ -153,7 +170,7 @@ export default function AQQuestionnaire({ language, userId, onComplete }: Props)
                     <div className="flex shrink-0 gap-2">
                       <button
                         type="button"
-                        onClick={() => handleAnswer(q.id, true)}
+                        onClick={(e) => handleAnswer(q.id, true, e)}
                         className={`rounded-lg border-2 px-4 py-1.5 text-sm font-semibold transition-all ${
                           answers[q.id] === true ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground hover:border-primary/50"
                         }`}
@@ -162,7 +179,7 @@ export default function AQQuestionnaire({ language, userId, onComplete }: Props)
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleAnswer(q.id, false)}
+                        onClick={(e) => handleAnswer(q.id, false, e)}
                         className={`rounded-lg border-2 px-4 py-1.5 text-sm font-semibold transition-all ${
                           answers[q.id] === false ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground hover:border-primary/50"
                         }`}

@@ -5,6 +5,7 @@ import { GAME_CLIPS, DISTRACTOR_CLIPS, ClipConfig } from "@/config/videoConfig";
 import { CheckCircle, XCircle } from "lucide-react";
 import { ResponseLog } from "@/types/game";
 import { gameCopy, Language, t } from "@/lib/gameCopy";
+import { MotionClick, normalizeClickCoords, saveMotionTrial } from "@/lib/motionTracking";
 
 interface Props {
   onComplete: () => void;
@@ -27,6 +28,8 @@ export default function ShortTermMemory({ onComplete, onLogResponse, language }:
   const [qIndex, setQIndex] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const startTimeRef = useRef(Date.now());
+  const clicksRef = useRef<MotionClick[]>([]);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   const questions = useMemo(() => {
     return TEST_CLIPS.map((key) => {
@@ -40,10 +43,20 @@ export default function ShortTermMemory({ onComplete, onLogResponse, language }:
 
   const q = questions[qIndex];
 
-  const handleSelect = useCallback((clip: ClipConfig) => {
+  const handleSelect = useCallback((clip: ClipConfig, e: React.MouseEvent<HTMLButtonElement>) => {
     if (selected) return;
     const responseTime = Date.now() - startTimeRef.current;
     const isCorrect = clip.id === q.correctId;
+    const coords = normalizeClickCoords(e, gridRef.current);
+    clicksRef.current.push({
+      x: coords.x,
+      y: coords.y,
+      t: responseTime,
+      box_id: clip.id,
+      target: q.targetLabel,
+      selected: clip.label,
+      correct: isCorrect,
+    });
     setSelected(clip.id);
     onLogResponse({
       stage: "short_term",
@@ -56,6 +69,9 @@ export default function ShortTermMemory({ onComplete, onLogResponse, language }:
   }, [selected, q, onLogResponse]);
 
   const handleNext = useCallback(() => {
+    // Save motion tracking for the just-answered question
+    void saveMotionTrial({ trialNumber: 11 + qIndex, clicks: clicksRef.current });
+    clicksRef.current = [];
     if (qIndex + 1 < questions.length) {
       setQIndex(qIndex + 1);
       setSelected(null);
@@ -79,7 +95,7 @@ export default function ShortTermMemory({ onComplete, onLogResponse, language }:
         <p className="mt-2 text-muted-foreground">{t(language, gameCopy.shortTerm.helper)}</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div ref={gridRef} className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {q.options.map((clip) => {
           const isCorrect = clip.id === q.correctId;
           const isSelected = selected === clip.id;
@@ -88,7 +104,7 @@ export default function ShortTermMemory({ onComplete, onLogResponse, language }:
             <motion.button
               key={clip.id}
               whileTap={{ scale: 0.96 }}
-              onClick={() => handleSelect(clip)}
+              onClick={(e) => handleSelect(clip, e)}
               disabled={!!selected}
               className={`relative overflow-hidden rounded-lg border-2 transition-all ${
                 showResult && isCorrect

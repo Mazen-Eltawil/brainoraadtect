@@ -6,6 +6,7 @@ import { CheckCircle, XCircle, RotateCcw } from "lucide-react";
 import { ResponseLog } from "@/types/game";
 import { gameCopy, Language, t } from "@/lib/gameCopy";
 import StageIntro from "./StageIntro";
+import { MotionClick, normalizeClickCoords, saveMotionTrial } from "@/lib/motionTracking";
 
 interface Props {
   onComplete: () => void;
@@ -28,6 +29,8 @@ export default function LongTermMemory({ onComplete, onLogResponse, language, is
   const [selected, setSelected] = useState<string | null>(null);
   const startTimeRef = useRef(Date.now());
   const videoRef = useRef<HTMLVideoElement>(null);
+  const clicksRef = useRef<MotionClick[]>([]);
+  const optionsRef = useRef<HTMLDivElement>(null);
 
   const questions = useMemo(() => {
     return CLIP_ORDER.map((key) => {
@@ -58,18 +61,32 @@ export default function LongTermMemory({ onComplete, onLogResponse, language, is
 
   const correctLabel = GAME_CLIPS[q.correctKey].label;
 
-  const handleSelect = useCallback((optKey: string) => {
+  const handleSelect = useCallback((optKey: string, e: React.MouseEvent<HTMLButtonElement>) => {
     if (selected) return;
     setSelected(optKey);
     const selectedLabel = GAME_CLIPS[optKey]?.label ?? optKey;
+    const isCorrect = optKey === q.correctKey;
+    const responseTime = Date.now() - startTimeRef.current;
+    const coords = normalizeClickCoords(e, optionsRef.current);
+    clicksRef.current.push({
+      x: coords.x,
+      y: coords.y,
+      t: responseTime,
+      box_id: optKey,
+      target: correctLabel,
+      selected: selectedLabel,
+      correct: isCorrect,
+    });
     onLogResponse({
       stage: "long_term", target: correctLabel, selected: selectedLabel,
-      isCorrect: optKey === q.correctKey, responseTimeMs: Date.now() - startTimeRef.current,
+      isCorrect, responseTimeMs: responseTime,
       timestamp: new Date().toISOString(),
     });
   }, [selected, q, correctLabel, onLogResponse]);
 
   const handleNext = useCallback(() => {
+    void saveMotionTrial({ trialNumber: 31 + qIndex, clicks: clicksRef.current });
+    clicksRef.current = [];
     if (qIndex + 1 < questions.length) {
       setQIndex(qIndex + 1);
       setSelected(null);
@@ -106,14 +123,14 @@ export default function LongTermMemory({ onComplete, onLogResponse, language, is
           </Button>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div ref={optionsRef} className="grid grid-cols-2 gap-3">
         {q.options.map((opt) => {
           const isCorrect = opt.key === q.correctKey;
           const isSelected = selected === opt.key;
           const showResult = selected !== null;
           const displayLabel = language === "ar" ? opt.label_ar : opt.label;
           return (
-            <motion.button key={opt.key} whileTap={{ scale: 0.96 }} onClick={() => handleSelect(opt.key)} disabled={!!selected}
+            <motion.button key={opt.key} whileTap={{ scale: 0.96 }} onClick={(e) => handleSelect(opt.key, e)} disabled={!!selected}
               className={`flex items-center justify-between rounded-lg border-2 p-4 text-lg font-semibold transition-all ${
                 showResult && isCorrect ? "border-success bg-success/5 text-foreground"
                   : showResult && isSelected && !isCorrect ? "border-destructive bg-destructive/5 text-foreground"
