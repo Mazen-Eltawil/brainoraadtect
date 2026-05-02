@@ -23,6 +23,9 @@ export default function AQQuestionnaire({ language, userId, onComplete }: Props)
   const [qPlaying, setQPlaying] = useState(false);
   const [qPaused, setQPaused] = useState(false);
   const qAudioRef = useRef<HTMLAudioElement | null>(null);
+  const startTimeRef = useRef(Date.now());
+  const clicksRef = useRef<MotionClick[]>([]);
+  const formRef = useRef<HTMLDivElement>(null);
 
   const allAnswered = AQ_QUESTIONS.every((q) => answers[q.id] !== undefined);
 
