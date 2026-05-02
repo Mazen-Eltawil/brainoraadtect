@@ -29,6 +29,8 @@ export default function LongTermMemory({ onComplete, onLogResponse, language, is
   const [selected, setSelected] = useState<string | null>(null);
   const startTimeRef = useRef(Date.now());
   const videoRef = useRef<HTMLVideoElement>(null);
+  const clicksRef = useRef<MotionClick[]>([]);
+  const optionsRef = useRef<HTMLDivElement>(null);
 
   const questions = useMemo(() => {
     return CLIP_ORDER.map((key) => {
