@@ -62,8 +62,20 @@ export default function AQQuestionnaire({ language, userId, onComplete }: Props)
     };
   }, []);
 
-  const handleAnswer = useCallback((id: number, val: boolean) => {
+  const handleAnswer = useCallback((id: number, val: boolean, e?: React.MouseEvent<HTMLButtonElement>) => {
     setAnswers((prev) => ({ ...prev, [id]: val }));
+    if (e) {
+      const coords = normalizeClickCoords(e, formRef.current);
+      clicksRef.current.push({
+        x: coords.x,
+        y: coords.y,
+        t: Date.now() - startTimeRef.current,
+        box_id: `q${id}_${val ? "yes" : "no"}`,
+        target: `q${id}`,
+        selected: val ? "yes" : "no",
+        correct: true,
+      });
+    }
   }, []);
 
   const handleSubmit = useCallback(async () => {
