@@ -61,18 +61,32 @@ export default function LongTermMemory({ onComplete, onLogResponse, language, is
 
   const correctLabel = GAME_CLIPS[q.correctKey].label;
 
-  const handleSelect = useCallback((optKey: string) => {
+  const handleSelect = useCallback((optKey: string, e: React.MouseEvent<HTMLButtonElement>) => {
     if (selected) return;
     setSelected(optKey);
     const selectedLabel = GAME_CLIPS[optKey]?.label ?? optKey;
+    const isCorrect = optKey === q.correctKey;
+    const responseTime = Date.now() - startTimeRef.current;
+    const coords = normalizeClickCoords(e, optionsRef.current);
+    clicksRef.current.push({
+      x: coords.x,
+      y: coords.y,
+      t: responseTime,
+      box_id: optKey,
+      target: correctLabel,
+      selected: selectedLabel,
+      correct: isCorrect,
+    });
     onLogResponse({
       stage: "long_term", target: correctLabel, selected: selectedLabel,
-      isCorrect: optKey === q.correctKey, responseTimeMs: Date.now() - startTimeRef.current,
+      isCorrect, responseTimeMs: responseTime,
       timestamp: new Date().toISOString(),
     });
   }, [selected, q, correctLabel, onLogResponse]);
 
   const handleNext = useCallback(() => {
+    void saveMotionTrial({ trialNumber: 31 + qIndex, clicks: clicksRef.current });
+    clicksRef.current = [];
     if (qIndex + 1 < questions.length) {
       setQIndex(qIndex + 1);
       setSelected(null);
