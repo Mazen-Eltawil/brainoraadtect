@@ -147,7 +147,14 @@ function PuzzleGrid({ config, stageNum, onFinish, language }: {
       const email = user?.email;
       if (email) {
         const trialNumber = stageNum;
-        const id = `${email}${trialNumber}`;
+        // Count existing rows for this email+trial to make unique id across replays
+        const { count } = await supabase
+          .from("click_motion_tracking")
+          .select("*", { count: "exact", head: true })
+          .eq("email", email)
+          .eq("trial_number", trialNumber);
+        const attempt = (count ?? 0) + 1;
+        const id = attempt === 1 ? `${email}${trialNumber}` : `${email}${trialNumber}_${attempt}`;
         const clicks = clicksRef.current;
         const click_coordinates = clicks.map((c) => ({ x: c.x, y: c.y, t: c.t, tile: c.tile_type }));
         const correctness_sequence = clicks.map((c) => (c.correct ? 1 : 0));
