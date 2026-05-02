@@ -78,7 +78,7 @@ export default function ReorderingStage({ onComplete, onResult, language }: Prop
         ))}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      <div ref={optionsRef} className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {REORDERING_OPTIONS.map((opt) => {
           const isCorrect = opt.label === CORRECT_REORDERING;
           const isSelected = selected === opt.label;
@@ -87,7 +87,7 @@ export default function ReorderingStage({ onComplete, onResult, language }: Prop
             <motion.button
               key={opt.label}
               whileTap={{ scale: 0.96 }}
-              onClick={() => handleSelect(opt.label)}
+              onClick={(e) => handleSelect(opt.label, e)}
               disabled={!!selected}
               className={`relative rounded-lg border-2 bg-surface p-3 text-left transition-all ${
                 showResult && isCorrect ? "border-success bg-success/5"
@@ -114,7 +114,7 @@ export default function ReorderingStage({ onComplete, onResult, language }: Prop
               ? t(language, gameCopy.reordering.correct)
               : `${t(language, gameCopy.reordering.incorrectPrefix)} (${REORDERING_OPTIONS.find((o) => o.label === CORRECT_REORDERING)?.sequence.join(" → ")}).`}
           </p>
-          <Button onClick={onComplete} size="lg">{t(language, gameCopy.reordering.continue)}</Button>
+          <Button onClick={handleContinue} size="lg">{t(language, gameCopy.reordering.continue)}</Button>
         </motion.div>
       )}
     </motion.div>
