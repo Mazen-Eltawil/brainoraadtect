@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { SIX_EIGHT_SEGMENTS } from "@/config/videoConfig";
@@ -7,6 +7,7 @@ import { CheckCircle, XCircle } from "lucide-react";
 import { gameCopy, Language, t } from "@/lib/gameCopy";
 import { getAudioSrc } from "@/config/videoConfig";
 import StageIntro from "./StageIntro";
+import { MotionClick, normalizeClickCoords, saveMotionTrial } from "@/lib/motionTracking";
 
 interface Props {
   onComplete: () => void;
