@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getAudioSrc } from "@/config/videoConfig";
 import StageIntro from "@/components/game/StageIntro";
 import { Volume2, Pause, RotateCcw } from "lucide-react";
+import { MotionClick, normalizeClickCoords, saveMotionTrial } from "@/lib/motionTracking";
 
 interface Props {
   language: Language;
