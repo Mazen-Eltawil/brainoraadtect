@@ -6,6 +6,18 @@ import { getAudioSrc } from "@/config/videoConfig";
 import { PuzzleRunLog } from "@/types/game";
 import { gameCopy, Language, t } from "@/lib/gameCopy";
 import StageIntro from "./StageIntro";
+import { supabase } from "@/integrations/supabase/client";
+
+interface ClickRecord {
+  x: number; // normalized 0-1 within grid
+  y: number; // normalized 0-1 within grid
+  row: number;
+  col: number;
+  box_id: string; // e.g. "r2c0"
+  tile_type: TileType;
+  correct: boolean; // was this a valid/legal move
+  t: number; // ms since trial start
+}
 
 interface Props {
   onComplete: () => void;
