@@ -104,7 +104,7 @@ export default function ShortTermMemory({ onComplete, onLogResponse, language }:
             <motion.button
               key={clip.id}
               whileTap={{ scale: 0.96 }}
-              onClick={() => handleSelect(clip)}
+              onClick={(e) => handleSelect(clip, e)}
               disabled={!!selected}
               className={`relative overflow-hidden rounded-lg border-2 transition-all ${
                 showResult && isCorrect
