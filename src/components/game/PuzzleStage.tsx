@@ -95,17 +95,44 @@ function PuzzleGrid({ config, stageNum, onFinish, language }: {
     dispatch({ type: "RESET" });
   }
   const startTimeRef = useRef(Date.now());
+  const clicksRef = useRef<ClickRecord[]>([]);
+
+  const recordClick = useCallback((row: number, col: number, isLegal: boolean) => {
+    const tileType = config.grid[row][col];
+    // Normalized coords: center of tile within 3x3 grid (0-1)
+    const x = (col + 0.5) / 3;
+    const y = (row + 0.5) / 3;
+    clicksRef.current.push({
+      x: Math.round(x * 10000) / 10000,
+      y: Math.round(y * 10000) / 10000,
+      row,
+      col,
+      box_id: `r${row}c${col}`,
+      tile_type: tileType,
+      correct: isLegal,
+      t: Date.now() - startTimeRef.current,
+    });
+  }, [config]);
 
   const handleTileClick = useCallback((row: number, col: number) => {
     if (state.status === "idle" && row === config.startPos[0] && col === config.startPos[1]) {
       startTimeRef.current = Date.now();
+      clicksRef.current = [];
+      recordClick(row, col, true);
       dispatch({ type: "START" });
       return;
     }
+    if (state.status !== "playing" || !state.currentPos) {
+      recordClick(row, col, false);
+      return;
+    }
+    const isVisited = state.path.some((p) => posEq(p, [row, col]));
+    const isLegal = isAdjacent(state.currentPos, [row, col]) && !isVisited;
+    recordClick(row, col, isLegal);
     dispatch({ type: "MOVE", pos: [row, col] });
-  }, [state.status, config.startPos]);
+  }, [state.status, state.currentPos, state.path, config.startPos, recordClick]);
 
-  const handleFinish = useCallback(() => {
+  const handleFinish = useCallback(async () => {
     const score = calcScore(state, config);
     const run: PuzzleRunLog = {
       path: state.path, success: state.status === "success",
@@ -113,8 +140,36 @@ function PuzzleGrid({ config, stageNum, onFinish, language }: {
       durationMs: Date.now() - startTimeRef.current,
       score,
     };
+
+    // Persist motion tracking for this trial
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const email = user?.email;
+      if (email) {
+        const trialNumber = stageNum;
+        const id = `${email}${trialNumber}`;
+        const clicks = clicksRef.current;
+        const click_coordinates = clicks.map((c) => ({ x: c.x, y: c.y, t: c.t, tile: c.tile_type }));
+        const correctness_sequence = clicks.map((c) => (c.correct ? 1 : 0));
+        const box_ids = clicks.map((c) => c.box_id);
+        const { error } = await supabase.from("click_motion_tracking").insert({
+          id,
+          email,
+          trial_number: trialNumber,
+          click_coordinates,
+          correctness_sequence,
+          box_ids,
+          total_clicks: clicks.length,
+        } as any);
+        if (error) console.error("click_motion_tracking insert error:", error);
+        else console.log(`Saved motion tracking for trial ${trialNumber} (${clicks.length} clicks)`);
+      }
+    } catch (e) {
+      console.error("Motion tracking save failed:", e);
+    }
+
     onFinish(run);
-  }, [state, config, onFinish]);
+  }, [state, config, onFinish, stageNum]);
 
   const handleRetry = useCallback(() => { dispatch({ type: "RESET" }); }, []);
 
