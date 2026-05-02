@@ -144,7 +144,7 @@ export default function AQQuestionnaire({ language, userId, onComplete }: Props)
         )}
       </div>
 
-      <div className="space-y-6">
+      <div ref={formRef} className="space-y-6">
         {categories.map((cat) => (
           <div key={cat} className="rounded-xl border border-border bg-surface p-5 shadow-sm">
             <h3 className="mb-4 text-sm font-bold uppercase tracking-widest text-primary">{cat}</h3>
@@ -170,7 +170,7 @@ export default function AQQuestionnaire({ language, userId, onComplete }: Props)
                     <div className="flex shrink-0 gap-2">
                       <button
                         type="button"
-                        onClick={() => handleAnswer(q.id, true)}
+                        onClick={(e) => handleAnswer(q.id, true, e)}
                         className={`rounded-lg border-2 px-4 py-1.5 text-sm font-semibold transition-all ${
                           answers[q.id] === true ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground hover:border-primary/50"
                         }`}
@@ -179,7 +179,7 @@ export default function AQQuestionnaire({ language, userId, onComplete }: Props)
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleAnswer(q.id, false)}
+                        onClick={(e) => handleAnswer(q.id, false, e)}
                         className={`rounded-lg border-2 px-4 py-1.5 text-sm font-semibold transition-all ${
                           answers[q.id] === false ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground hover:border-primary/50"
                         }`}
