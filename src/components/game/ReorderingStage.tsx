@@ -17,6 +17,9 @@ interface Props {
 
 export default function ReorderingStage({ onComplete, onResult, language }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
+  const startTimeRef = useRef(Date.now());
+  const clicksRef = useRef<MotionClick[]>([]);
+  const optionsRef = useRef<HTMLDivElement>(null);
 
   const shuffledSegments = useMemo(() => {
     const shuffled = [...SIX_EIGHT_SEGMENTS];
@@ -27,10 +30,26 @@ export default function ReorderingStage({ onComplete, onResult, language }: Prop
     return shuffled;
   }, []);
 
-  const handleSelect = (label: string) => {
+  const handleSelect = (label: string, e: React.MouseEvent<HTMLButtonElement>) => {
     if (selected) return;
+    const isCorrect = label === CORRECT_REORDERING;
+    const coords = normalizeClickCoords(e, optionsRef.current);
+    clicksRef.current.push({
+      x: coords.x,
+      y: coords.y,
+      t: Date.now() - startTimeRef.current,
+      box_id: label,
+      target: CORRECT_REORDERING,
+      selected: label,
+      correct: isCorrect,
+    });
     setSelected(label);
-    onResult(label, label === CORRECT_REORDERING);
+    onResult(label, isCorrect);
+  };
+
+  const handleContinue = () => {
+    void saveMotionTrial({ trialNumber: 21, clicks: clicksRef.current });
+    onComplete();
   };
 
   return (
