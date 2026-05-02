@@ -95,7 +95,7 @@ export default function ShortTermMemory({ onComplete, onLogResponse, language }:
         <p className="mt-2 text-muted-foreground">{t(language, gameCopy.shortTerm.helper)}</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div ref={gridRef} className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {q.options.map((clip) => {
           const isCorrect = clip.id === q.correctId;
           const isSelected = selected === clip.id;
