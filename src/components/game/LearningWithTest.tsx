@@ -36,7 +36,8 @@ export default function LearningWithTest({ onComplete, onLogLearning, onLogRespo
   const videoRef = useRef<HTMLVideoElement>(null);
   const startTimeRef = useRef(Date.now());
 
-  const currentKey = CLIP_ORDER[clipIndex];
+  const shuffledClipOrder = useMemo(() => shuffleArray([...CLIP_ORDER]), []);
+  const currentKey = shuffledClipOrder[clipIndex];
   const currentClip = GAME_CLIPS[currentKey];
 
   // Reset first-rep flag when clip changes
@@ -110,7 +111,7 @@ export default function LearningWithTest({ onComplete, onLogLearning, onLogRespo
 
   const handleNext = useCallback(() => {
     const nextClip = clipIndex + 1;
-    if (nextClip < CLIP_ORDER.length) {
+    if (nextClip < shuffledClipOrder.length) {
       setClipIndex(nextClip);
       setRep(0);
       setPhase("learning");
@@ -119,7 +120,7 @@ export default function LearningWithTest({ onComplete, onLogLearning, onLogRespo
     } else {
       setPhase("done");
     }
-  }, [clipIndex]);
+  }, [clipIndex, shuffledClipOrder.length]);
 
   if (phase === "done") {
     return (
@@ -178,12 +179,12 @@ export default function LearningWithTest({ onComplete, onLogLearning, onLogRespo
         {selected && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-6 flex justify-end">
             <Button onClick={handleNext} size="lg">
-              {clipIndex + 1 < CLIP_ORDER.length ? t(language, gameCopy.shortTerm.nextQuestion) : t(language, gameCopy.shortTerm.continue)}
+              {clipIndex + 1 < shuffledClipOrder.length ? t(language, gameCopy.shortTerm.nextQuestion) : t(language, gameCopy.shortTerm.continue)}
             </Button>
           </motion.div>
         )}
         <p className="mt-4 text-center text-sm text-muted-foreground">
-          {t(language, gameCopy.shortTerm.question)} {clipIndex + 1} {t(language, gameCopy.shortTerm.of)} {CLIP_ORDER.length}
+          {t(language, gameCopy.shortTerm.question)} {clipIndex + 1} {t(language, gameCopy.shortTerm.of)} {shuffledClipOrder.length}
         </p>
       </motion.div>
     );
@@ -218,7 +219,7 @@ export default function LearningWithTest({ onComplete, onLogLearning, onLogRespo
         </AnimatePresence>
         <div className="mt-4 flex w-full items-center justify-between gap-3">
           <span className="text-sm text-muted-foreground" style={{ direction: "ltr", unicodeBidi: "embed" }}>
-            {t(language, gameCopy.learning.clipCounter)} {clipIndex + 1}/{CLIP_ORDER.length} · {t(language, gameCopy.learning.repetition)} {rep + 1}/{REPS_PER_CLIP}
+            {t(language, gameCopy.learning.clipCounter)} {clipIndex + 1}/{shuffledClipOrder.length} · {t(language, gameCopy.learning.repetition)} {rep + 1}/{REPS_PER_CLIP}
           </span>
           <div className="flex gap-2">
             {hasCompletedFirstRep && !playing && (
