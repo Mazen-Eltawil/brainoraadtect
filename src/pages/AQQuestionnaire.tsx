@@ -120,24 +120,17 @@ export default function AQQuestionnaire({ language, userId, onComplete }: Props)
     );
   }
 
-  const categories = [...new Set(AQ_QUESTIONS.map((q) => q.category))];
-
-  // Shuffle questions within each category once per mount for variation
-  const shuffledByCategoryRef = useRef<Record<string, typeof AQ_QUESTIONS> | null>(null);
-  if (!shuffledByCategoryRef.current) {
-    const map: Record<string, typeof AQ_QUESTIONS> = {};
-    for (const cat of categories) {
-      const items = AQ_QUESTIONS.filter((q) => q.category === cat);
-      // Fisher-Yates
-      for (let i = items.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [items[i], items[j]] = [items[j], items[i]];
-      }
-      map[cat] = items;
+  // Fully shuffle all questions across categories once per mount
+  const shuffledQuestionsRef = useRef<typeof AQ_QUESTIONS | null>(null);
+  if (!shuffledQuestionsRef.current) {
+    const items = [...AQ_QUESTIONS];
+    for (let i = items.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [items[i], items[j]] = [items[j], items[i]];
     }
-    shuffledByCategoryRef.current = map;
+    shuffledQuestionsRef.current = items;
   }
-  const shuffledByCategory = shuffledByCategoryRef.current;
+  const shuffledQuestions = shuffledQuestionsRef.current;
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-3xl px-4 py-8">

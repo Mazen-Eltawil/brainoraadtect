@@ -32,11 +32,12 @@ export default function ShortTermMemory({ onComplete, onLogResponse, language }:
   const gridRef = useRef<HTMLDivElement>(null);
 
   const questions = useMemo(() => {
-    return TEST_CLIPS.map((key) => {
+    const shuffledOrder = shuffleArray([...TEST_CLIPS]);
+    return shuffledOrder.map((key) => {
       const correct = GAME_CLIPS[key];
-      const others = Object.values(GAME_CLIPS).filter((c) => c.id !== correct.id);
-      const distractors = [...others, ...DISTRACTOR_CLIPS.slice(0, 2)];
-      const options = shuffleArray([correct, ...distractors.slice(0, 3)]);
+      const others = shuffleArray(Object.values(GAME_CLIPS).filter((c) => c.id !== correct.id));
+      const distractorsPool = shuffleArray([...others, ...DISTRACTOR_CLIPS]);
+      const options = shuffleArray([correct, ...distractorsPool.slice(0, 3)]);
       return { targetLabel: correct.label, correctId: correct.id, options };
     });
   }, []);
