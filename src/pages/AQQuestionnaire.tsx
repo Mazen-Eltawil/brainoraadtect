@@ -167,7 +167,7 @@ export default function AQQuestionnaire({ language, userId, onComplete }: Props)
             <h3 className="mb-4 text-sm font-bold uppercase tracking-widest text-primary">{cat}</h3>
             <div className="space-y-4">
               <AnimatePresence>
-                {AQ_QUESTIONS.filter((q) => q.category === cat).map((q, idx) => (
+                {shuffledByCategory[cat].map((q, idx) => (
                   <motion.div
                     key={q.id}
                     initial={{ opacity: 0, x: -20 }}
