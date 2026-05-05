@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { GAME_CLIPS, DISTRACTOR_CLIPS, ClipConfig } from "@/config/videoConfig";
+import { GAME_CLIPS, CLIP_ORDER, DISTRACTOR_CLIPS, ClipConfig } from "@/config/videoConfig";
 import { CheckCircle, XCircle } from "lucide-react";
 import { ResponseLog } from "@/types/game";
 import { gameCopy, Language, t } from "@/lib/gameCopy";
@@ -12,8 +12,6 @@ interface Props {
   onLogResponse: (r: ResponseLog) => void;
   language: Language;
 }
-
-const TEST_CLIPS = ["fasla", "money", "marshmallow"] as const;
 
 function shuffleArray<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -32,7 +30,7 @@ export default function ShortTermMemory({ onComplete, onLogResponse, language }:
   const gridRef = useRef<HTMLDivElement>(null);
 
   const questions = useMemo(() => {
-    const shuffledOrder = shuffleArray([...TEST_CLIPS]);
+    const shuffledOrder = shuffleArray([...CLIP_ORDER]);
     return shuffledOrder.map((key) => {
       const correct = GAME_CLIPS[key];
       const others = shuffleArray(Object.values(GAME_CLIPS).filter((c) => c.id !== correct.id));
