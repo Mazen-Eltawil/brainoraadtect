@@ -1,7 +1,7 @@
 import { useReducer, useCallback, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { PUZZLE_ASSETS, PUZZLE_STAGES, PuzzleConfig, TileType } from "@/config/puzzleConfig";
+import { PUZZLE_ASSETS, generatePuzzleStages, PuzzleConfig, TileType } from "@/config/puzzleConfig";
 import { getAudioSrc } from "@/config/videoConfig";
 import { PuzzleRunLog } from "@/types/game";
 import { gameCopy, Language, t } from "@/lib/gameCopy";
