@@ -154,55 +154,52 @@ export default function AQQuestionnaire({ language, userId, onComplete }: Props)
         )}
       </div>
 
-      <div ref={formRef} className="space-y-6">
-        {categories.map((cat) => (
-          <div key={cat} className="rounded-xl border border-border bg-surface p-5 shadow-sm">
-            <h3 className="mb-4 text-sm font-bold uppercase tracking-widest text-primary">{cat}</h3>
-            <div className="space-y-4">
-              <AnimatePresence>
-                {shuffledByCategory[cat].map((q, idx) => (
-                  <motion.div
-                    key={q.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                    className="flex items-start gap-4 rounded-lg border border-border/50 p-4"
-                  >
-                    <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                      {q.id}
-                    </span>
-                    <div className="flex-1">
-                      <p className="text-sm leading-relaxed text-foreground">{q.text[language]}</p>
-                      <p className="mt-0.5 text-xs text-muted-foreground">
-                        ({q.weight} {q.weight === 1 ? "point" : "points"})
-                      </p>
-                    </div>
-                    <div className="flex shrink-0 gap-2">
-                      <button
-                        type="button"
-                        onClick={(e) => handleAnswer(q.id, true, e)}
-                        className={`rounded-lg border-2 px-4 py-1.5 text-sm font-semibold transition-all ${
-                          answers[q.id] === true ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground hover:border-primary/50"
-                        }`}
-                      >
-                        {t(language, gameCopy.questionnaire.yes)}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(e) => handleAnswer(q.id, false, e)}
-                        className={`rounded-lg border-2 px-4 py-1.5 text-sm font-semibold transition-all ${
-                          answers[q.id] === false ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground hover:border-primary/50"
-                        }`}
-                      >
-                        {t(language, gameCopy.questionnaire.no)}
-                      </button>
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
+      <div ref={formRef} className="space-y-3">
+        <div className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+          <div className="space-y-4">
+            <AnimatePresence>
+              {shuffledQuestions.map((q, idx) => (
+                <motion.div
+                  key={q.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.02 }}
+                  className="flex items-start gap-4 rounded-lg border border-border/50 p-4"
+                >
+                  <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                    {idx + 1}
+                  </span>
+                  <div className="flex-1">
+                    <p className="text-sm leading-relaxed text-foreground">{q.text[language]}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      ({q.weight} {q.weight === 1 ? "point" : "points"})
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 gap-2">
+                    <button
+                      type="button"
+                      onClick={(e) => handleAnswer(q.id, true, e)}
+                      className={`rounded-lg border-2 px-4 py-1.5 text-sm font-semibold transition-all ${
+                        answers[q.id] === true ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground hover:border-primary/50"
+                      }`}
+                    >
+                      {t(language, gameCopy.questionnaire.yes)}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => handleAnswer(q.id, false, e)}
+                      className={`rounded-lg border-2 px-4 py-1.5 text-sm font-semibold transition-all ${
+                        answers[q.id] === false ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground hover:border-primary/50"
+                      }`}
+                    >
+                      {t(language, gameCopy.questionnaire.no)}
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
-        ))}
+        </div>
       </div>
 
       <div className="mt-8 flex justify-center">
