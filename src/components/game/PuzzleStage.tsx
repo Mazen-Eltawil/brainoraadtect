@@ -1,7 +1,7 @@
 import { useReducer, useCallback, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { PUZZLE_ASSETS, PUZZLE_STAGES, PuzzleConfig, TileType } from "@/config/puzzleConfig";
+import { PUZZLE_ASSETS, generatePuzzleStages, PuzzleConfig, TileType } from "@/config/puzzleConfig";
 import { getAudioSrc } from "@/config/videoConfig";
 import { PuzzleRunLog } from "@/types/game";
 import { gameCopy, Language, t } from "@/lib/gameCopy";
@@ -294,6 +294,8 @@ function PuzzleGrid({ config, stageNum, onFinish, language }: {
 export default function PuzzleStage({ onComplete, onResult, language }: Props) {
   const [currentStage, setCurrentStage] = useState(0);
   const [runs, setRuns] = useState<PuzzleRunLog[]>([]);
+  // Generate a fresh shuffled set of puzzle variants for this play session
+  const stagesRef = useRef<PuzzleConfig[]>(generatePuzzleStages());
 
   const handleStageFinish = useCallback((run: PuzzleRunLog) => {
     const newRuns = [...runs, run];
@@ -306,7 +308,7 @@ export default function PuzzleStage({ onComplete, onResult, language }: Props) {
     }
   }, [runs, currentStage, onResult, onComplete]);
 
-  const config = PUZZLE_STAGES[currentStage];
+  const config = stagesRef.current[currentStage];
   const stageLabel = language === "ar" ? `المرحلة ${currentStage + 1}/3` : `Stage ${currentStage + 1}/3`;
 
   return (

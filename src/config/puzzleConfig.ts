@@ -21,42 +21,121 @@ export interface PuzzleConfig {
   keyPos: [number, number];
 }
 
-// Swapped: old stage 2 is now stage 1, old stage 1 is now stage 2
-export const PUZZLE_STAGES: PuzzleConfig[] = [
-  // Stage 1 (was stage 2): crabs at (0,0) and (1,1)
+// Pool of puzzle variants — randomly sampled per session for variety.
+// Each grid is solvable: a path exists from start -> key -> chest avoiding crabs.
+// Difficulty buckets: easy (1 crab), medium (2 crabs), hard (3 crabs).
+export const PUZZLE_VARIANTS_EASY: PuzzleConfig[] = [
+  {
+    grid: [
+      ["empty", "empty", "chest"],
+      ["empty", "crab", "empty"],
+      ["start", "empty", "key"],
+    ],
+    startPos: [2, 0], chestPos: [0, 2], keyPos: [2, 2],
+  },
+  {
+    grid: [
+      ["key", "empty", "chest"],
+      ["empty", "crab", "empty"],
+      ["start", "empty", "empty"],
+    ],
+    startPos: [2, 0], chestPos: [0, 2], keyPos: [0, 0],
+  },
+  {
+    grid: [
+      ["chest", "empty", "key"],
+      ["empty", "crab", "empty"],
+      ["start", "empty", "empty"],
+    ],
+    startPos: [2, 0], chestPos: [0, 0], keyPos: [0, 2],
+  },
+];
+
+export const PUZZLE_VARIANTS_MEDIUM: PuzzleConfig[] = [
   {
     grid: [
       ["crab", "empty", "chest"],
       ["empty", "crab", "empty"],
       ["start", "empty", "key"],
     ],
-    startPos: [2, 0],
-    chestPos: [0, 2],
-    keyPos: [2, 2],
+    startPos: [2, 0], chestPos: [0, 2], keyPos: [2, 2],
   },
-  // Stage 2 (was stage 1): crabs at (0,1) and (2,1)
   {
     grid: [
       ["empty", "crab", "chest"],
       ["empty", "empty", "empty"],
       ["start", "crab", "key"],
     ],
-    startPos: [2, 0],
-    chestPos: [0, 2],
-    keyPos: [2, 2],
+    startPos: [2, 0], chestPos: [0, 2], keyPos: [2, 2],
   },
-  // Stage 3: crabs at (1,0), (0,1), and (2,1) — hardest, 3 crabs
+  {
+    grid: [
+      ["chest", "empty", "empty"],
+      ["crab", "empty", "crab"],
+      ["start", "empty", "key"],
+    ],
+    startPos: [2, 0], chestPos: [0, 0], keyPos: [2, 2],
+  },
+  {
+    grid: [
+      ["key", "empty", "crab"],
+      ["empty", "empty", "empty"],
+      ["start", "crab", "chest"],
+    ],
+    startPos: [2, 0], chestPos: [2, 2], keyPos: [0, 0],
+  },
+];
+
+export const PUZZLE_VARIANTS_HARD: PuzzleConfig[] = [
   {
     grid: [
       ["empty", "crab", "chest"],
       ["crab", "empty", "empty"],
       ["start", "crab", "key"],
     ],
-    startPos: [2, 0],
-    chestPos: [0, 2],
-    keyPos: [2, 2],
+    startPos: [2, 0], chestPos: [0, 2], keyPos: [2, 2],
+  },
+  {
+    grid: [
+      ["chest", "crab", "empty"],
+      ["empty", "empty", "crab"],
+      ["start", "crab", "key"],
+    ],
+    startPos: [2, 0], chestPos: [0, 0], keyPos: [2, 2],
+  },
+  {
+    grid: [
+      ["key", "crab", "chest"],
+      ["empty", "empty", "crab"],
+      ["start", "crab", "empty"],
+    ],
+    startPos: [2, 0], chestPos: [0, 2], keyPos: [0, 0],
+  },
+  {
+    grid: [
+      ["empty", "crab", "key"],
+      ["crab", "empty", "empty"],
+      ["start", "crab", "chest"],
+    ],
+    startPos: [2, 0], chestPos: [2, 2], keyPos: [0, 2],
   },
 ];
+
+function pickRandom<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// Builds a fresh shuffled set of 3 stages (easy -> medium -> hard) per call.
+export function generatePuzzleStages(): PuzzleConfig[] {
+  return [
+    pickRandom(PUZZLE_VARIANTS_EASY),
+    pickRandom(PUZZLE_VARIANTS_MEDIUM),
+    pickRandom(PUZZLE_VARIANTS_HARD),
+  ];
+}
+
+// Default static set kept for backward-compat imports (legacy).
+export const PUZZLE_STAGES: PuzzleConfig[] = generatePuzzleStages();
 
 // Legacy exports for backward compat
 export const GRID_MAP = PUZZLE_STAGES[0].grid;

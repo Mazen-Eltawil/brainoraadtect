@@ -122,6 +122,23 @@ export default function AQQuestionnaire({ language, userId, onComplete }: Props)
 
   const categories = [...new Set(AQ_QUESTIONS.map((q) => q.category))];
 
+  // Shuffle questions within each category once per mount for variation
+  const shuffledByCategoryRef = useRef<Record<string, typeof AQ_QUESTIONS> | null>(null);
+  if (!shuffledByCategoryRef.current) {
+    const map: Record<string, typeof AQ_QUESTIONS> = {};
+    for (const cat of categories) {
+      const items = AQ_QUESTIONS.filter((q) => q.category === cat);
+      // Fisher-Yates
+      for (let i = items.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [items[i], items[j]] = [items[j], items[i]];
+      }
+      map[cat] = items;
+    }
+    shuffledByCategoryRef.current = map;
+  }
+  const shuffledByCategory = shuffledByCategoryRef.current;
+
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-3xl px-4 py-8">
       <StageIntro
@@ -150,7 +167,7 @@ export default function AQQuestionnaire({ language, userId, onComplete }: Props)
             <h3 className="mb-4 text-sm font-bold uppercase tracking-widest text-primary">{cat}</h3>
             <div className="space-y-4">
               <AnimatePresence>
-                {AQ_QUESTIONS.filter((q) => q.category === cat).map((q, idx) => (
+                {shuffledByCategory[cat].map((q, idx) => (
                   <motion.div
                     key={q.id}
                     initial={{ opacity: 0, x: -20 }}
